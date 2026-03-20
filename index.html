@@ -385,6 +385,13 @@
       margin-bottom: 1.1rem;
     }
 
+    .disclaimer {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: .75rem;
+    }
+
     /* ── Conversation drawer ───────────────────────── */
 
     #drawer-overlay {
@@ -542,6 +549,13 @@
     <button id="reset-btn">← Load new files</button>
   </header>
 
+  <div class="intro-block" style="padding-left:2rem;padding-right:2rem;max-width:1100px;margin:0 auto;">
+    <h2>Welcome to your ChatGPT Conversation Explorer</h2>
+    <p>Created by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></p>
+    <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Use the tabs above to explore.</p>
+    <p class="disclaimer"><em>Topics are estimated using keyword matching and may not always be accurate. Some conversations may land in the wrong category or fall into "Other." Use this as a rough guide, not a precise analysis.</em></p>
+  </div>
+
   <div id="stats-bar">
     <div class="stat-card">
       <div class="label">Total Conversations</div>
@@ -571,10 +585,6 @@
 
   <!-- Overview -->
   <div class="tab-panel active" id="tab-overview">
-    <div class="intro-block">
-      <h2>Welcome to your ChatGPT Conversation Explorer</h2>
-      <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Use the tabs above to explore. Colors are consistent: each topic has the same color everywhere it appears.</p>
-    </div>
     <div class="card">
       <h2>Conversations per Month</h2>
       <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration.</p>
@@ -638,6 +648,8 @@
 
 <footer>
   <span>Built by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></span>
+  <span class="footer-divider">·</span>
+  <span>v2 · 2026-03-20</span>
 </footer>
 
 <!-- ── Conversation drawer ────────────────────────────────────────────────── -->
@@ -654,90 +666,190 @@
 </div>
 
 <script>
-// ── Topic taxonomy (IAB Content Taxonomy–anchored) ───────────────────────────
+// ── Topic taxonomy (IAB Content Taxonomy 3.0, Tier 1 + Tier 2 keywords) ───────
+// Source: https://github.com/InteractiveAdvertisingBureau/Taxonomies
 
 const TOPICS = {
-  '💻 Technology & Coding': [
-    'code', 'coding', 'programming', 'python', 'javascript', 'typescript',
-    'html', 'css', 'api', 'database', 'github', 'bug', 'error', 'function',
-    'software', 'script', 'git', 'react', 'node', 'sql', 'debug', 'deploy',
-    'repo', 'docker', 'kubernetes', 'server', 'frontend', 'backend',
-    'framework', 'algorithm', 'bash', 'terminal', 'linux', 'app', 'website',
-    'streamlit', 'wordpress', 'flask', 'django', 'rust', 'golang', 'java',
-    'php', 'ruby', 'swift', 'cursor', 'notion', 'claude code', 'regex',
-    'library', 'web', 'devops', 'cloud', 'aws', 'azure', 'supabase',
-    'apps', 'building', 'side project', 'pwa', 'native', 'launch', 'ship',
+  '🎭 Arts & Entertainment': [
+    'movie', 'movies', 'film', 'films', 'cinema', 'tv', 'television', 'show',
+    'series', 'episode', 'streaming', 'netflix', 'hulu', 'disney', 'hbo',
+    'music', 'song', 'songs', 'album', 'artist', 'band', 'concert', 'lyrics',
+    'playlist', 'spotify', 'podcast', 'actor', 'actress', 'director', 'plot',
+    'theater', 'theatre', 'comedy', 'drama', 'documentary', 'animation',
+    'anime', 'celebrity', 'entertainment', 'review', 'recommend',
   ],
-  '🤖 AI & Automation': [
-    'ai', 'chatgpt', 'gpt', 'claude', 'llm', 'prompt', 'automation', 'agent',
-    'workflow', 'machine learning', 'deep learning', 'neural', 'model',
-    'training', 'embedding', 'vector', 'langchain', 'openai', 'anthropic',
-    'midjourney', 'generative', 'fine-tune', 'artificial intelligence',
-    'stable diffusion', 'diffusion', 'rag', 'inference',
+  '🚗 Automotive': [
+    'car', 'cars', 'truck', 'vehicle', 'vehicles', 'driving', 'driver',
+    'automotive', 'mechanic', 'tire', 'tires', 'lease', 'dealership',
+    'electric vehicle', 'ev', 'suv', 'sedan', 'motorcycle', 'mileage',
+    'fuel', 'transmission', 'oil change', 'car repair', 'auto repair',
+    'car insurance', 'car engine', 'brake', 'brakes', 'exhaust',
+    'windshield', 'parking', 'speeding',
   ],
-  '💰 Business & Finance': [
-    'business', 'money', 'finance', 'pricing', 'revenue', 'client', 'invoice',
-    'contract', 'marketing', 'sales', 'startup', 'profit', 'cost', 'fee',
-    'budget', 'investment', 'stock', 'tax', 'accounting', 'entrepreneur',
-    'freelance', 'consulting', 'saas', 'product', 'market', 'brand', 'launch',
-    'package', 'coach', 'coaching', 'b2b', 'funnel', 'lead', 'conversion',
+  '📖 Books & Literature': [
+    'book', 'books', 'novel', 'novels', 'read', 'reading', 'fiction',
+    'nonfiction', 'author', 'chapter', 'plot', 'character', 'memoir',
+    'biography', 'autobiography', 'poetry', 'poem', 'library', 'kindle',
+    'audiobook', 'literature', 'comic', 'graphic novel', 'publisher',
+    'manuscript', 'writing a book', 'nanowrimo',
   ],
-  '💼 Work & Career': [
-    'email', 'meeting', 'job', 'career', 'resume', 'cv', 'interview',
-    'manager', 'team', 'colleague', 'promotion', 'performance', 'salary',
-    'hire', 'linkedin', 'workplace', 'remote', 'leadership', 'feedback',
-    'onboard', 'layoff', 'strategy',
+  '💼 Business & Finance': [
+    'business', 'company', 'startup', 'entrepreneur', 'marketing', 'sales',
+    'revenue', 'profit', 'loss', 'strategy', 'management', 'investor',
+    'pitch', 'client', 'customers', 'market', 'brand', 'product', 'launch',
+    'growth', 'b2b', 'b2c', 'saas', 'consulting', 'agency', 'pricing',
+    'invoice', 'contract', 'fee', 'package', 'coach', 'coaching',
+    'freelance', 'funnel', 'lead', 'conversion', 'economy', 'industry',
+  ],
+  '📋 Careers': [
+    'job', 'jobs', 'career', 'careers', 'resume', 'cv', 'interview',
+    'salary', 'promotion', 'manager', 'workplace', 'hiring', 'layoff',
+    'remote', 'networking', 'linkedin', 'cover letter', 'application',
+    'skills', 'role', 'onboarding', 'performance review', 'apprenticeship',
+    'vocational', 'job search', 'recruiter', 'headhunter', 'offer letter',
+  ],
+  '🎓 Education': [
+    'learn', 'learning', 'study', 'studying', 'course', 'school', 'college',
+    'university', 'degree', 'exam', 'homework', 'tutor', 'lesson', 'student',
+    'teacher', 'grade', 'test', 'quiz', 'academic', 'thesis', 'dissertation',
+    'phd', 'masters', 'homeschool', 'online course', 'certification',
+    'language learning', 'tutoring', 'curriculum', 'lecture',
+  ],
+  '👪 Family & Relationships': [
+    'family', 'parent', 'parenting', 'child', 'children', 'kids', 'baby',
+    'toddler', 'teenager', 'teen', 'marriage', 'wedding', 'divorce', 'dating',
+    'relationship', 'partner', 'spouse', 'husband', 'wife', 'mother', 'father',
+    'mom', 'dad', 'grandparent', 'sibling', 'custody', 'pregnancy', 'newborn',
+    'eldercare', 'single', 'breakup', 'bereavement', 'grief', 'adoption',
+  ],
+  '🍽️ Food & Drink': [
+    'recipe', 'cook', 'cooking', 'food', 'eat', 'eating', 'dinner', 'lunch',
+    'breakfast', 'meal', 'ingredient', 'kitchen', 'bake', 'baking',
+    'restaurant', 'cuisine', 'vegan', 'vegetarian', 'coffee', 'wine',
+    'cocktail', 'grocery', 'barbecue', 'grill', 'dessert', 'snack',
+    'nutrition', 'diet', 'calories', 'world cuisine', 'allergy',
+  ],
+  '💪 Healthy Living': [
+    'health', 'fitness', 'exercise', 'workout', 'gym', 'yoga', 'meditation',
+    'sleep', 'stress', 'anxiety', 'mental health', 'therapy', 'wellness',
+    'burnout', 'recovery', 'weight', 'running', 'walking', 'stretching',
+    'mindfulness', 'breathwork', 'nutrition', 'supplements', 'hydration',
+    'chronic pain', 'energy', 'fatigue', 'senior health', 'women\'s health',
+  ],
+  '🎨 Hobbies & Interests': [
+    'hobby', 'hobbies', 'craft', 'crafts', 'knit', 'knitting', 'crochet',
+    'sew', 'sewing', 'paint', 'painting', 'draw', 'drawing', 'sketch',
+    'photography', 'puzzle', 'puzzles', 'board game', 'chess', 'diy',
+    'woodwork', 'pottery', 'ceramics', 'collecting', 'birdwatching',
+    'beekeeping', 'genealogy', 'ancestry', 'magic', 'model', 'improv',
+    'sketchnote', 'claymation', 'animation', 'fresco',
+  ],
+  '🏡 Home & Garden': [
+    'home', 'house', 'apartment', 'garden', 'gardening', 'plant', 'plants',
+    'grow', 'growing', 'seed', 'seeds', 'seedling', 'seedlings', 'tomato',
+    'vegetable', 'vegetables', 'flower', 'lawn', 'soil', 'compost',
+    'raised bed', 'raised beds', 'herb', 'herbs', 'mulch', 'watering',
+    'planting', 'harvest', 'frost', 'weed', 'weeds', 'zucchini', 'garlic',
+    'lettuce', 'basil', 'interior', 'decor', 'furniture', 'renovation',
+    'remodel', 'organize', 'clean', 'landscaping', 'smart home', 'appliance',
+    'aphid', 'aphids', 'pest', 'pests', 'fungal', 'blight', 'pruning',
+    'companion planting', 'succession planting', 'organic',
+  ],
+  '🏥 Medical Health': [
+    'doctor', 'medical', 'symptom', 'symptoms', 'diagnosis', 'medication',
+    'prescription', 'surgery', 'hospital', 'disease', 'condition', 'vaccine',
+    'treatment', 'chronic', 'pain', 'injury', 'physical therapy', 'specialist',
+    'health insurance', 'appointment', 'test results', 'blood work',
+  ],
+  '💰 Personal Finance': [
+    'money', 'budget', 'budgeting', 'saving', 'savings', 'invest', 'investing',
+    'debt', 'loan', 'credit', 'tax', 'taxes', 'retirement', '401k', 'ira',
+    'bank', 'banking', 'financial', 'afford', 'income', 'expense', 'net worth',
+    'mortgage', 'rent', 'frugal', 'spending', 'insurance', 'emergency fund',
+    'financial planning', 'stock', 'index fund', 'compound interest',
+  ],
+  '🐾 Pets': [
+    'pet', 'pets', 'dog', 'dogs', 'cat', 'cats', 'puppy', 'kitten', 'vet',
+    'veterinary', 'animal', 'fish', 'bird', 'rabbit', 'hamster', 'reptile',
+    'training', 'breed', 'adopt', 'adoption', 'paw', 'fur', 'leash', 'collar',
+    'feeding', 'grooming',
+  ],
+  '🏛️ Politics & Society': [
+    'politics', 'political', 'government', 'election', 'vote', 'voting',
+    'policy', 'law', 'legal', 'rights', 'social', 'society', 'democracy',
+    'republican', 'democrat', 'conservative', 'liberal', 'immigration',
+    'healthcare policy', 'climate policy', 'news', 'media', 'protest',
+    'justice', 'equality', 'civil', 'legislation', 'congress', 'senate',
+  ],
+  '🔬 Science & Nature': [
+    'science', 'scientific', 'biology', 'chemistry', 'physics', 'math',
+    'mathematics', 'space', 'astronomy', 'planet', 'evolution', 'genetics',
+    'environment', 'climate', 'nature', 'species', 'experiment', 'data',
+    'statistics', 'geography', 'geology', 'weather', 'ecology', 'ocean',
+    'research', 'study', 'findings', 'theory',
+  ],
+  '🛒 Shopping': [
+    'buy', 'buying', 'purchase', 'shop', 'shopping', 'product', 'recommend',
+    'price', 'discount', 'amazon', 'online', 'store', 'gift', 'comparison',
+    'worth it', 'deal', 'sale', 'coupon', 'review', 'unboxing', 'returns',
+  ],
+  '⚽ Sports': [
+    'sport', 'sports', 'football', 'basketball', 'baseball', 'soccer',
+    'tennis', 'golf', 'running', 'marathon', 'swim', 'swimming', 'cycling',
+    'hiking', 'athlete', 'team', 'league', 'championship', 'training',
+    'sports coach', 'season', 'playoffs', 'fantasy sports', 'cricket', 'rugby',
+  ],
+  '👗 Style & Fashion': [
+    'fashion', 'style', 'clothing', 'clothes', 'outfit', 'wear', 'dress',
+    'shirt', 'pants', 'shoes', 'accessories', 'beauty', 'makeup', 'skincare',
+    'hair', 'haircut', 'wardrobe', 'trend', 'designer', 'streetwear',
+    'personal care', 'grooming', 'nails', 'perfume',
+  ],
+  '💻 Technology & Computing': [
+    'tech', 'technology', 'computer', 'software', 'code', 'coding',
+    'programming', 'python', 'javascript', 'typescript', 'html', 'css',
+    'api', 'database', 'github', 'bug', 'error', 'function', 'script',
+    'git', 'react', 'node', 'sql', 'debug', 'deploy', 'repo', 'docker',
+    'server', 'frontend', 'backend', 'app', 'apps', 'website', 'building',
+    'side project', 'startup tech', 'cloud', 'aws', 'azure', 'supabase',
+    'ai', 'artificial intelligence', 'chatgpt', 'gpt', 'claude', 'llm',
+    'prompt', 'automation', 'machine learning', 'model', 'openai',
+    'phone', 'iphone', 'android', 'laptop', 'mac', 'windows', 'security',
+    'privacy', 'data', 'devops', 'pwa', 'native',
+  ],
+  '✈️ Travel': [
+    'travel', 'trip', 'vacation', 'holiday', 'flight', 'hotel', 'airbnb',
+    'destination', 'itinerary', 'passport', 'visa', 'abroad', 'international',
+    'road trip', 'backpack', 'resort', 'cruise', 'tourist', 'sightseeing',
+    'packing', 'luggage', 'layover', 'hostel',
+  ],
+  '🎮 Video Gaming': [
+    'game', 'games', 'gaming', 'video game', 'playstation', 'xbox',
+    'nintendo', 'steam', 'esports', 'minecraft', 'fortnite', 'rpg', 'fps',
+    'strategy game', 'multiplayer', 'character', 'quest', 'level', 'mmo',
+    'indie game', 'mobile game', 'twitch', 'streamer',
   ],
   '✍️ Writing & Content': [
-    'write', 'writing', 'draft', 'essay', 'article', 'blog', 'post',
-    'newsletter', 'substack', 'content', 'copy', 'edit', 'publish', 'caption',
-    'hook', 'headline', 'pitch', 'proposal', 'narrative', 'grammar',
-    'proofread', 'note', 'cover letter', 'script', 'transcript',
-  ],
-  '🎨 Creative & Design': [
-    'design', 'art', 'creative', 'illustration', 'drawing', 'sketch', 'photo',
-    'video', 'music', 'poem', 'fiction', 'novel', 'sketchnote', 'crochet',
-    'knit', 'craft', 'visual', 'color', 'logo', 'ui', 'ux', 'figma', 'canva',
-    'claymation', 'animation', 'fresco', 'brand identity',
-  ],
-  '📚 Education & Research': [
-    'learn', 'research', 'explain', 'understand', 'study', 'course', 'book',
-    'summary', 'analysis', 'guide', 'tutorial', 'lesson', 'concept', 'theory',
-    'history', 'science', 'math', 'physics', 'chemistry', 'biology',
-    'psychology', 'philosophy', 'economics', 'statistics', 'overview',
-    'compare', 'what is', 'how to',
-  ],
-  '🍳 Food & Home': [
-    'recipe', 'cook', 'food', 'dinner', 'lunch', 'breakfast', 'meal', 'home',
-    'clean', 'organize', 'decor', 'kitchen', 'bake', 'ingredient', 'garden',
-    'plant', 'renovation', 'furniture', 'interior', 'apartment', 'house',
-    'tomato', 'vegetable', 'vegetables', 'seed', 'seeds', 'seedling', 'seedlings',
-    'zucchini', 'aphid', 'aphids', 'raised bed', 'raised beds', 'soil', 'compost',
-    'harvest', 'watering', 'planting', 'grow', 'growing', 'frost', 'weed',
-    'garlic', 'lettuce', 'basil', 'herb', 'herbs', 'bed', 'beds', 'mulch',
-  ],
-  '🌿 Health & Wellness': [
-    'health', 'wellness', 'anxiety', 'stress', 'sleep', 'exercise', 'fitness',
-    'meditation', 'mental', 'therapy', 'burnout', 'energy', 'mindful', 'diet',
-    'nutrition', 'workout', 'yoga', 'running', 'doctor', 'symptom', 'recovery',
-  ],
-  '🧠 Ideas & Planning': [
-    'idea', 'plan', 'brainstorm', 'concept', 'vision', 'goal', 'decision',
-    'reflect', 'focus', 'project', 'roadmap', 'prioritize', 'habit', 'routine',
-    'productivity', 'system', 'process', 'think',
+    'write', 'writing', 'essay', 'article', 'blog', 'post', 'newsletter',
+    'substack', 'content', 'draft', 'edit', 'proofread', 'copy', 'headline',
+    'caption', 'pitch', 'proposal', 'narrative', 'grammar', 'publish',
+    'author', 'journalist', 'social media', 'linkedin post', 'twitter',
+    'script', 'transcript', 'cover letter',
   ],
   '🪞 Personal Reflection': [
-    'fear', 'sharing', 'vulnerability', 'identity', 'becoming', 'self', 'worth',
-    'doubt', 'confidence', 'imposter', 'visibility', 'courage', 'shame', 'grief',
-    'meaning', 'purpose', 'values', 'authenticity', 'growth', 'mindset', 'story',
+    'fear', 'vulnerability', 'identity', 'becoming', 'self', 'worth',
+    'doubt', 'confidence', 'imposter', 'visibility', 'courage', 'shame',
+    'meaning', 'purpose', 'values', 'authenticity', 'growth', 'mindset',
     'feeling', 'feelings', 'emotion', 'transition', 'change', 'loss', 'joy',
     'gratitude', 'loneliness', 'belonging', 'enough', 'permission', 'voice',
-    'pattern', 'wound', 'healing', 'boundaries', 'truth', 'presence', 'awareness',
+    'pattern', 'healing', 'boundaries', 'truth', 'presence', 'awareness',
+    'therapy', 'self-worth', 'self-doubt', 'inner critic',
   ],
-  '✈️ Travel & Lifestyle': [
-    'travel', 'trip', 'vacation', 'flight', 'hotel', 'destination', 'itinerary',
-    'passport', 'visa', 'culture', 'lifestyle', 'hobby', 'sport', 'game',
-    'movie', 'entertainment', 'event',
+  '🧠 Ideas & Planning': [
+    'idea', 'ideas', 'plan', 'planning', 'brainstorm', 'concept', 'vision',
+    'goal', 'goals', 'decision', 'focus', 'project', 'roadmap', 'prioritize',
+    'habit', 'routine', 'productivity', 'system', 'process', 'think',
+    'reflect', 'strategy', 'framework', 'organize', 'schedule',
   ],
 };
 
@@ -763,15 +875,26 @@ function tokenize(text) {
 
 let idf = {};
 
+// Build a richer document: title (3x weight) + first 5 user messages (300 chars each)
+function buildDocText(conv) {
+  const title = conv.title + ' ' + conv.title + ' ' + conv.title;
+  const msgs = (conv.messages || [])
+    .filter(m => m.role === 'user')
+    .slice(0, 5)
+    .map(m => m.text.slice(0, 300))
+    .join(' ');
+  return title + ' ' + msgs;
+}
+
 function buildIDF(conversations) {
   const N = conversations.length;
   const df = {};
   for (const c of conversations) {
-    const words = new Set(tokenize(c.title));
+    const words = new Set(tokenize(buildDocText(c)));
     for (const w of words) df[w] = (df[w] || 0) + 1;
   }
   for (const [w, count] of Object.entries(df)) {
-    idf[w] = Math.log((N + 1) / (count + 1)) + 1; // smoothed IDF
+    idf[w] = Math.log((N + 1) / (count + 1)) + 1;
   }
 }
 
@@ -793,7 +916,6 @@ function scoreTopics(vec, rawText) {
     let score = 0;
     for (const kw of keywords) {
       if (kw.includes(' ')) {
-        // multi-word: raw text match with a flat bonus
         if (rawText.toLowerCase().includes(kw)) score += 0.5;
       } else if (vec[kw]) {
         score += vec[kw];
@@ -804,23 +926,10 @@ function scoreTopics(vec, rawText) {
   return { topic: best, score: bestScore };
 }
 
-function classifyConversation(title, messages) {
-  // Pass 1: score against title
-  const titleVec = tfidfVector(title);
-  const { topic, score } = scoreTopics(titleVec, title);
-  if (score > 0) return topic;
-
-  // Pass 2: fall back to first ~500 chars of the user's opening messages
-  const excerpt = messages
-    .filter(m => m.role === 'user')
-    .slice(0, 3)
-    .map(m => m.text)
-    .join(' ')
-    .slice(0, 500);
-  if (!excerpt) return '💬 Other';
-
-  const excerptVec = tfidfVector(excerpt);
-  return scoreTopics(excerptVec, excerpt).topic;
+function classifyConversation(conv) {
+  const docText = buildDocText(conv);
+  const vec = tfidfVector(docText);
+  return scoreTopics(vec, docText).topic;
 }
 
 // ── Parse conversations ──────────────────────────────────────────────────────
@@ -893,10 +1002,10 @@ function parseFiles(files) {
         };
       });
 
-    // Pass 2: build IDF from all titles, then classify
+    // Pass 2: build IDF, then classify using title + message content
     buildIDF(parsed);
     allConversations = parsed
-      .map(c => ({ ...c, topic: classifyConversation(c.title, c.messages) }))
+      .map(c => ({ ...c, topic: classifyConversation(c) }))
       .sort((a, b) => a.date - b.date);
 
     buildDashboard();
@@ -1400,3 +1509,4 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 </script>
 </body>
 </html>
+<!-- Fri Mar 20 11:48:40 MST 2026 -->
