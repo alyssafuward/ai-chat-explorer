@@ -654,27 +654,160 @@
 </div>
 
 <script>
-// ── Topic classifier ─────────────────────────────────────────────────────────
+// ── Topic taxonomy (IAB Content Taxonomy–anchored) ───────────────────────────
 
 const TOPICS = {
-  '💼 Work & Career':       ['email', 'meeting', 'job', 'career', 'resume', 'interview', 'manager', 'team', 'colleague', 'promotion', 'performance', 'salary', 'hire', 'linkedin'],
-  '💻 Tech & Coding':       ['code', 'coding', 'programming', 'python', 'javascript', 'html', 'css', 'api', 'database', 'github', 'bug', 'error', 'function', 'app', 'software', 'script', 'git', 'react', 'node', 'sql', 'debug', 'deploy', 'repo', 'streamlit', 'wordpress', 'notion', 'cursor', 'claude code'],
-  '✍️ Writing & Content':   ['write', 'writing', 'draft', 'essay', 'article', 'blog', 'post', 'newsletter', 'substack', 'content', 'copy', 'edit', 'feedback', 'publish', 'note', 'caption', 'hook', 'headline'],
-  '🎨 Creative':            ['design', 'art', 'creative', 'illustration', 'drawing', 'sketch', 'photo', 'video', 'music', 'story', 'poem', 'fiction', 'novel', 'sketchnote', 'crochet', 'knit', 'craft', 'brand', 'visual', 'color', 'fresco', 'claymation'],
-  '📚 Learning & Research': ['learn', 'research', 'explain', 'understand', 'study', 'course', 'book', 'summary', 'analysis', 'review', 'guide', 'how to', 'what is', 'overview', 'compare'],
-  '🍳 Food & Home':         ['recipe', 'cook', 'food', 'dinner', 'lunch', 'breakfast', 'meal', 'home', 'clean', 'organize', 'decor', 'kitchen', 'bake', 'ingredient'],
-  '💰 Business & Finance':  ['business', 'money', 'pricing', 'revenue', 'client', 'invoice', 'contract', 'marketing', 'sales', 'strategy', 'startup', 'profit', 'cost', 'fee', 'package', 'coach', 'coaching', 'consulting'],
-  '🤖 AI & Automation':     ['ai', 'chatgpt', 'gpt', 'claude', 'llm', 'prompt', 'automation', 'agent', 'workflow', 'machine learning', 'framework', 'model'],
-  '🧠 Ideas & Planning':    ['idea', 'plan', 'brainstorm', 'concept', 'vision', 'goal', 'decision', 'strategy', 'think', 'reflect', 'focus', 'project'],
-  '🌿 Health & Wellness':   ['health', 'wellness', 'anxiety', 'stress', 'sleep', 'exercise', 'meditation', 'mental', 'therapy', 'burnout', 'energy', 'mindful'],
+  '💻 Technology & Coding': [
+    'code', 'coding', 'programming', 'python', 'javascript', 'typescript',
+    'html', 'css', 'api', 'database', 'github', 'bug', 'error', 'function',
+    'software', 'script', 'git', 'react', 'node', 'sql', 'debug', 'deploy',
+    'repo', 'docker', 'kubernetes', 'server', 'frontend', 'backend',
+    'framework', 'algorithm', 'bash', 'terminal', 'linux', 'app', 'website',
+    'streamlit', 'wordpress', 'flask', 'django', 'rust', 'golang', 'java',
+    'php', 'ruby', 'swift', 'cursor', 'notion', 'claude code', 'regex',
+    'library', 'web', 'devops', 'cloud', 'aws', 'azure', 'supabase',
+  ],
+  '🤖 AI & Automation': [
+    'ai', 'chatgpt', 'gpt', 'claude', 'llm', 'prompt', 'automation', 'agent',
+    'workflow', 'machine learning', 'deep learning', 'neural', 'model',
+    'training', 'embedding', 'vector', 'langchain', 'openai', 'anthropic',
+    'midjourney', 'generative', 'fine-tune', 'artificial intelligence',
+    'stable diffusion', 'diffusion', 'rag', 'inference',
+  ],
+  '💰 Business & Finance': [
+    'business', 'money', 'finance', 'pricing', 'revenue', 'client', 'invoice',
+    'contract', 'marketing', 'sales', 'startup', 'profit', 'cost', 'fee',
+    'budget', 'investment', 'stock', 'tax', 'accounting', 'entrepreneur',
+    'freelance', 'consulting', 'saas', 'product', 'market', 'brand', 'launch',
+    'package', 'coach', 'coaching', 'b2b', 'funnel', 'lead', 'conversion',
+  ],
+  '💼 Work & Career': [
+    'email', 'meeting', 'job', 'career', 'resume', 'cv', 'interview',
+    'manager', 'team', 'colleague', 'promotion', 'performance', 'salary',
+    'hire', 'linkedin', 'workplace', 'remote', 'leadership', 'feedback',
+    'onboard', 'layoff', 'strategy',
+  ],
+  '✍️ Writing & Content': [
+    'write', 'writing', 'draft', 'essay', 'article', 'blog', 'post',
+    'newsletter', 'substack', 'content', 'copy', 'edit', 'publish', 'caption',
+    'hook', 'headline', 'pitch', 'proposal', 'narrative', 'grammar',
+    'proofread', 'note', 'cover letter', 'script', 'transcript',
+  ],
+  '🎨 Creative & Design': [
+    'design', 'art', 'creative', 'illustration', 'drawing', 'sketch', 'photo',
+    'video', 'music', 'poem', 'fiction', 'novel', 'sketchnote', 'crochet',
+    'knit', 'craft', 'visual', 'color', 'logo', 'ui', 'ux', 'figma', 'canva',
+    'claymation', 'animation', 'fresco', 'brand identity',
+  ],
+  '📚 Education & Research': [
+    'learn', 'research', 'explain', 'understand', 'study', 'course', 'book',
+    'summary', 'analysis', 'guide', 'tutorial', 'lesson', 'concept', 'theory',
+    'history', 'science', 'math', 'physics', 'chemistry', 'biology',
+    'psychology', 'philosophy', 'economics', 'statistics', 'overview',
+    'compare', 'what is', 'how to',
+  ],
+  '🍳 Food & Home': [
+    'recipe', 'cook', 'food', 'dinner', 'lunch', 'breakfast', 'meal', 'home',
+    'clean', 'organize', 'decor', 'kitchen', 'bake', 'ingredient', 'garden',
+    'plant', 'renovation', 'furniture', 'interior', 'apartment', 'house',
+  ],
+  '🌿 Health & Wellness': [
+    'health', 'wellness', 'anxiety', 'stress', 'sleep', 'exercise', 'fitness',
+    'meditation', 'mental', 'therapy', 'burnout', 'energy', 'mindful', 'diet',
+    'nutrition', 'workout', 'yoga', 'running', 'doctor', 'symptom', 'recovery',
+  ],
+  '🧠 Ideas & Planning': [
+    'idea', 'plan', 'brainstorm', 'concept', 'vision', 'goal', 'decision',
+    'reflect', 'focus', 'project', 'roadmap', 'prioritize', 'habit', 'routine',
+    'productivity', 'system', 'process', 'think',
+  ],
+  '✈️ Travel & Lifestyle': [
+    'travel', 'trip', 'vacation', 'flight', 'hotel', 'destination', 'itinerary',
+    'passport', 'visa', 'culture', 'lifestyle', 'hobby', 'sport', 'game',
+    'movie', 'entertainment', 'event',
+  ],
 };
 
-function classifyTitle(title) {
-  const t = title.toLowerCase();
-  for (const [topic, keywords] of Object.entries(TOPICS)) {
-    if (keywords.some(k => t.includes(k))) return topic;
+// ── TF-IDF classifier ─────────────────────────────────────────────────────────
+
+const STOP_WORDS = new Set([
+  'a','an','the','and','or','but','in','on','at','to','for','of','with',
+  'by','from','up','about','into','is','are','was','were','be','been',
+  'being','have','has','had','do','does','did','will','would','could',
+  'should','may','might','can','this','that','these','those','i','me',
+  'my','we','our','you','your','he','his','she','her','it','its','they',
+  'their','all','each','every','both','more','most','other','some','no',
+  'not','only','so','than','too','very','just','get','make','use','used',
+  'new','help','using','also','way','need','want',
+]);
+
+function tokenize(text) {
+  return text.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+}
+
+let idf = {};
+
+function buildIDF(conversations) {
+  const N = conversations.length;
+  const df = {};
+  for (const c of conversations) {
+    const words = new Set(tokenize(c.title));
+    for (const w of words) df[w] = (df[w] || 0) + 1;
   }
-  return '💬 Other';
+  for (const [w, count] of Object.entries(df)) {
+    idf[w] = Math.log((N + 1) / (count + 1)) + 1; // smoothed IDF
+  }
+}
+
+function tfidfVector(text) {
+  const tokens = tokenize(text);
+  const tf = {};
+  for (const t of tokens) tf[t] = (tf[t] || 0) + 1;
+  const len = tokens.length || 1;
+  const vec = {};
+  for (const [w, count] of Object.entries(tf)) {
+    vec[w] = (count / len) * (idf[w] || 1);
+  }
+  return vec;
+}
+
+function scoreTopics(vec, rawText) {
+  let best = '💬 Other', bestScore = 0;
+  for (const [topic, keywords] of Object.entries(TOPICS)) {
+    let score = 0;
+    for (const kw of keywords) {
+      if (kw.includes(' ')) {
+        // multi-word: raw text match with a flat bonus
+        if (rawText.toLowerCase().includes(kw)) score += 0.5;
+      } else if (vec[kw]) {
+        score += vec[kw];
+      }
+    }
+    if (score > bestScore) { bestScore = score; best = topic; }
+  }
+  return { topic: best, score: bestScore };
+}
+
+function classifyConversation(title, messages) {
+  // Pass 1: score against title
+  const titleVec = tfidfVector(title);
+  const { topic, score } = scoreTopics(titleVec, title);
+  if (score > 0) return topic;
+
+  // Pass 2: fall back to first ~500 chars of the user's opening messages
+  const excerpt = messages
+    .filter(m => m.role === 'user')
+    .slice(0, 3)
+    .map(m => m.text)
+    .join(' ')
+    .slice(0, 500);
+  if (!excerpt) return '💬 Other';
+
+  const excerptVec = tfidfVector(excerpt);
+  return scoreTopics(excerptVec, excerpt).topic;
 }
 
 // ── Parse conversations ──────────────────────────────────────────────────────
@@ -705,7 +838,9 @@ function parseFiles(files) {
 
   Promise.all(readers).then(results => {
     const raw = results.flat();
-    allConversations = raw
+
+    // Pass 1: parse structure, no classification yet
+    const parsed = raw
       .filter(c => c && c.create_time)
       .map(c => {
         // Traverse tree from current_node → root, then reverse for chronological order
@@ -739,12 +874,16 @@ function parseFiles(files) {
           date,
           monthKey,
           monthLabel,
-          topic: classifyTitle(title),
           messages,
           userText: messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
           fullText: messages.map(m => m.text).join(' '),
         };
-      })
+      });
+
+    // Pass 2: build IDF from all titles, then classify
+    buildIDF(parsed);
+    allConversations = parsed
+      .map(c => ({ ...c, topic: classifyConversation(c.title, c.messages) }))
       .sort((a, b) => a.date - b.date);
 
     buildDashboard();
