@@ -427,7 +427,7 @@
       flex-shrink: 0;
     }
 
-    #drawer-close {
+    #drawer-close, #drawer-download {
       float: right;
       background: none;
       border: none;
@@ -437,7 +437,7 @@
       line-height: 1;
       margin-left: .5rem;
     }
-    #drawer-close:hover { color: var(--text); }
+    #drawer-close:hover, #drawer-download:hover { color: var(--text); }
 
     #drawer-title {
       font-size: 1rem;
@@ -659,6 +659,7 @@
   <div id="drawer">
     <div id="drawer-header">
       <button id="drawer-close">✕</button>
+      <button id="drawer-download" title="Download conversation">⬇</button>
       <div id="drawer-title"></div>
       <div id="drawer-meta"></div>
     </div>
@@ -1358,9 +1359,30 @@ function openConversation(convo) {
     }
   }
 
+  document.getElementById('drawer-download').onclick = () => downloadConversation(convo);
+
   overlay.classList.add('open');
   msgsEl.scrollTop = 0;
   document.body.style.overflow = 'hidden';
+}
+
+function downloadConversation(convo) {
+  const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const lines = [`${convo.title}`, `${date} · ${convo.topic}`, '', '---', ''];
+  for (const msg of convo.messages) {
+    if (!['user', 'assistant'].includes(msg.role)) continue;
+    const speaker = msg.role === 'user' ? 'You' : 'ChatGPT';
+    lines.push(`${speaker}:`);
+    lines.push(msg.text);
+    lines.push('');
+  }
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = convo.title.replace(/[^a-z0-9 _-]/gi, '').trim().replace(/\s+/g, '_').slice(0, 60) + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function closeDrawer() {
