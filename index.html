@@ -1633,6 +1633,28 @@ function showTopicConversations(topic) {
   const title = document.getElementById('convo-list-title');
   title.textContent = topic + ' · ' + convos.length + ' conversations';
 
+  // Select All / Deselect All button
+  const existingSelectBtn = document.getElementById('select-all-btn');
+  if (existingSelectBtn) existingSelectBtn.remove();
+  const selectBtn = document.createElement('button');
+  selectBtn.id = 'select-all-btn';
+  selectBtn.className = 'settings-btn';
+  selectBtn.style.cssText = 'font-size:.78rem;padding:.25rem .7rem';
+  const allMarked = () => convos.every(c => markedForDownload.has(c));
+  const updateSelectBtn = () => { selectBtn.textContent = allMarked() ? 'Deselect All' : 'Select All'; };
+  updateSelectBtn();
+  selectBtn.addEventListener('click', () => {
+    if (allMarked()) {
+      convos.forEach(c => { markedForDownload.delete(c); updateMarkUI(c); });
+    } else {
+      convos.forEach(c => { markedForDownload.add(c); updateMarkUI(c); });
+    }
+    updateSelectBtn();
+    renderDownloadsTab();
+    updateDownloadsBadge();
+  });
+  document.getElementById('convo-header').appendChild(selectBtn);
+
   const list = document.getElementById('convo-list');
   list.innerHTML = '';
   for (const c of convos) {
@@ -2076,11 +2098,15 @@ function refreshSettingsUI() {
       const status = document.getElementById('settings-save-status');
       const clearBtn = document.getElementById('clear-data-btn');
       if (savedAt) {
-        status.textContent = 'Last saved: ' + new Date(savedAt).toLocaleString();
+        const sizeMB = hasCurrent ? (JSON.stringify(allConversations).length / 1024 / 1024).toFixed(1) : '?';
+        status.textContent = 'Last saved: ' + new Date(savedAt).toLocaleString() + ' · ~' + sizeMB + ' MB in browser storage';
         clearBtn.disabled = false;
         document.getElementById('autosave-toggle').checked = true;
       } else {
-        status.textContent = 'No data saved in this browser.';
+        const sizeMB = hasCurrent ? (JSON.stringify(allConversations).length / 1024 / 1024).toFixed(1) : null;
+        status.textContent = sizeMB
+          ? 'No data saved. Current dataset is ~' + sizeMB + ' MB.'
+          : 'No data saved in this browser.';
         clearBtn.disabled = true;
       }
     };
