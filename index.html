@@ -440,7 +440,7 @@
       padding: .6rem 0;
       border-bottom: 1px solid var(--border);
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: .75rem;
     }
     .dl-item:last-child { border-bottom: none; }
@@ -1829,12 +1829,14 @@ function renderDownloadsTab() {
     title.style.cursor = 'pointer';
     title.addEventListener('click', () => openConversation(convo));
 
-    const convoChars = convo.messages.reduce((s, m) => s + m.text.length, 0);
-    const convoSize = convoChars > 1024 * 1024 ? (convoChars / 1024 / 1024).toFixed(1) + ' MB' : Math.round(convoChars / 1024) + ' KB';
-
-    const meta = document.createElement('span');
+    const meta = document.createElement('div');
     meta.className = 'dl-meta';
-    meta.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + convo.topic + ' · ~' + convoSize;
+    meta.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem';
+    const metaDate = document.createElement('span');
+    metaDate.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const metaTopic = document.createElement('span');
+    metaTopic.style.cssText = 'font-size:.72rem;color:var(--muted)';
+    metaTopic.textContent = convo.topic;
 
     const remove = document.createElement('button');
     remove.className = 'dl-remove';
@@ -1842,6 +1844,8 @@ function renderDownloadsTab() {
     remove.title = 'Remove';
     remove.addEventListener('click', () => { markedForDownload.delete(convo); renderDownloadsTab(); updateMarkUI(convo); updateDownloadsBadge(); });
 
+    meta.appendChild(metaDate);
+    meta.appendChild(metaTopic);
     item.appendChild(title);
     item.appendChild(meta);
     item.appendChild(remove);
