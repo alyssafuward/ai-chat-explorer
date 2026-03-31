@@ -790,19 +790,12 @@
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Save data in browser</div>
-            <div class="settings-row-sub">Reload your conversations instantly on return visits</div>
+            <div class="settings-row-sub">Saves now and on every future upload so you can reload instantly</div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" id="autosave-toggle">
             <span class="toggle-slider"></span>
           </label>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-row-label">Save now</div>
-            <div class="settings-row-sub">Manually save current data to browser</div>
-          </div>
-          <button class="settings-btn primary" id="save-now-btn" disabled>Save</button>
         </div>
         <div class="settings-row">
           <div>
@@ -2059,7 +2052,6 @@ function closeSettings() {
 
 function refreshSettingsUI() {
   const hasCurrent = allConversations.length > 0;
-  document.getElementById('save-now-btn').disabled = !hasCurrent;
   document.getElementById('export-data-btn').disabled = !hasCurrent;
 
   getDB().then(db => {
@@ -2139,15 +2131,6 @@ async function clearIndexedDB() {
     tx.onerror = e => reject(e.target.error);
   });
 }
-
-document.getElementById('save-now-btn').addEventListener('click', async () => {
-  const btn = document.getElementById('save-now-btn');
-  btn.textContent = 'Saving…';
-  btn.disabled = true;
-  await saveToIndexedDB();
-  btn.textContent = 'Saved ✓';
-  setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; }, 2000);
-});
 
 document.getElementById('autosave-toggle').addEventListener('change', async function () {
   if (this.checked && allConversations.length > 0) {
