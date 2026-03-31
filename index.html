@@ -599,6 +599,68 @@
       margin-top: .75rem;
     }
 
+    /* ── Chart drill-down overlay ─────────────────── */
+
+    #drilldown-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 200;
+      backdrop-filter: blur(2px);
+      align-items: flex-end;
+    }
+
+    #drilldown-overlay.open { display: flex; }
+
+    #drilldown-panel {
+      width: 100%;
+      max-height: 70vh;
+      background: var(--bg);
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform .25s ease;
+    }
+
+    #drilldown-overlay.open #drilldown-panel { transform: translateY(0); }
+
+    #drilldown-header {
+      padding: 1rem 1.5rem .85rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    #drilldown-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    #drilldown-close:hover { color: var(--text); }
+
+    #drilldown-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    #drilldown-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: .5rem 1.5rem 1.5rem;
+    }
+
+    .chart-clickable { cursor: pointer; }
+
     /* ── Conversation drawer ───────────────────────── */
 
     #drawer-overlay {
@@ -747,7 +809,7 @@
     You'll receive a <code>.zip</code> file — you can upload it directly, or extract it and upload the <code>conversations.json</code> file(s) inside.<br>
     <strong>Your data never leaves your browser.</strong>
   </p>
-  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.1 · 2026-03-31 13:38</p>
+  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.2 · 2026-03-31</p>
 </div>
 
 <!-- ── Dashboard ──────────────────────────────────────────────────────────── -->
@@ -859,7 +921,7 @@
   <div class="tab-panel active" id="tab-overview">
     <div class="card">
       <h2>Conversations per Month</h2>
-      <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration.</p>
+      <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration. <span style="color:var(--muted);font-size:.8em">Click any bar to browse that month's conversations.</span></p>
       <div class="chart-wrap"><canvas id="monthly-chart"></canvas></div>
     </div>
     <div class="card">
@@ -938,7 +1000,7 @@
     </div>
     <div class="card">
       <h2>Monthly Breakdown by Topic</h2>
-      <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default.</p>
+      <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default. <span style="color:var(--muted);font-size:.8em">Click any data point to see those conversations.</span></p>
       <div id="timeline-controls"></div>
       <div class="chart-wrap" style="height:380px"><canvas id="timeline-chart"></canvas></div>
     </div>
@@ -950,10 +1012,22 @@
 <footer>
   <span>Built by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></span>
   <span class="footer-divider">·</span>
-  <span>v2.1 · 2026-03-31 13:38</span>
+  <span>v2.2 · 2026-03-31</span>
 </footer>
 
 <!-- ── Conversation drawer ────────────────────────────────────────────────── -->
+
+<!-- ── Chart drill-down panel ─────────────────────────────────────────────── -->
+
+<div id="drilldown-overlay">
+  <div id="drilldown-panel">
+    <div id="drilldown-header">
+      <button id="drilldown-close">✕</button>
+      <div id="drilldown-title"></div>
+    </div>
+    <div id="drilldown-list"></div>
+  </div>
+</div>
 
 <div id="drawer-overlay">
   <div id="drawer">
@@ -1495,7 +1569,17 @@ function renderMonthlyChart(monthlyCounts) {
       scales: {
         x: { grid: { display: false }, ticks: { color: '#777' } },
         y: { grid: { color: '#EEEEEE' }, ticks: { color: '#777' }, beginAtZero: true },
-      }
+      },
+      onHover(e, elements) {
+        e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+      },
+      onClick(e, elements) {
+        if (!elements.length) return;
+        const monthLabel = labels[elements[0].index];
+        const convos = allConversations.filter(c => c.monthLabel === monthLabel)
+          .sort((a, b) => a.date - b.date);
+        openDrilldown(monthLabel + ' · ' + convos.length + ' conversation' + (convos.length !== 1 ? 's' : ''), convos);
+      },
     }
   });
 }
@@ -1595,7 +1679,21 @@ function renderTimeline() {
       scales: {
         x: { grid: { display: false }, ticks: { color: '#777' } },
         y: { grid: { color: '#EEEEEE' }, ticks: { color: '#777' }, beginAtZero: true },
-      }
+      },
+      onHover(e, elements) {
+        e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+      },
+      onClick(e, elements) {
+        if (!elements.length) return;
+        const idx = elements[0].index;
+        const dsIdx = elements[0].datasetIndex;
+        const monthLabel = monthLabels[idx];
+        const topic = datasets[dsIdx].label;
+        const convos = allConversations.filter(c => c.monthLabel === monthLabel && c.topic === topic)
+          .sort((a, b) => a.date - b.date);
+        if (!convos.length) return;
+        openDrilldown(topic + ' · ' + monthLabel + ' · ' + convos.length + ' conversation' + (convos.length !== 1 ? 's' : ''), convos);
+      },
     }
   });
 }
@@ -1921,7 +2019,47 @@ document.getElementById('drawer-close').addEventListener('click', closeDrawer);
 document.getElementById('drawer-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('drawer-overlay')) closeDrawer();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('drilldown-overlay').classList.contains('open')) closeDrilldown();
+    else closeDrawer();
+  }
+});
+
+// ── Chart drill-down ──────────────────────────────────────────────────────────
+
+function openDrilldown(title, convos) {
+  document.getElementById('drilldown-title').textContent = title;
+  const list = document.getElementById('drilldown-list');
+  list.innerHTML = '';
+  for (const c of convos) {
+    const item = document.createElement('div');
+    item.className = 'convo-item';
+    const t = document.createElement('span');
+    t.className = 'convo-title';
+    t.textContent = c.title;
+    const d = document.createElement('span');
+    d.className = 'convo-date';
+    d.textContent = c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    item.appendChild(t);
+    item.appendChild(d);
+    item.appendChild(makeMarkBtn(c));
+    item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
+    list.appendChild(item);
+  }
+  document.getElementById('drilldown-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrilldown() {
+  document.getElementById('drilldown-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('drilldown-close').addEventListener('click', closeDrilldown);
+document.getElementById('drilldown-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('drilldown-overlay')) closeDrilldown();
+});
 
 // ── Search ───────────────────────────────────────────────────────────────────
 
