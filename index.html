@@ -813,7 +813,7 @@
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Export conversations</div>
-            <div class="settings-row-sub">Download your parsed conversations as JSON</div>
+            <div class="settings-row-sub">Download your parsed conversations as JSON. This is a simplified format — it can be re-uploaded here but is not the same as your original ChatGPT export.</div>
           </div>
           <button class="settings-btn" id="export-data-btn" disabled>Export</button>
         </div>
@@ -1287,6 +1287,20 @@ async function parseFiles(files) {
       } else {
         raw.push(...JSON.parse(await file.text()));
       }
+    }
+
+    // Detect re-import of a previously exported file (has our format: date string + messages array, no create_time)
+    if (raw.length > 0 && raw[0].date && raw[0].messages && !raw[0].create_time) {
+      allConversations = raw.map(c => ({
+        ...c,
+        date: new Date(c.date),
+        monthKey: new Date(c.date).toISOString().slice(0, 7),
+        monthLabel: new Date(c.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        userText: c.messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
+        fullText: c.messages.map(m => m.text).join(' '),
+      })).sort((a, b) => a.date - b.date);
+      buildDashboard();
+      return;
     }
 
     // Pass 1: parse structure
