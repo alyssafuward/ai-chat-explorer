@@ -881,6 +881,7 @@
       <div id="topic-grid"></div>
     </div>
     <div class="card" id="convo-list-card" style="display:none">
+      <button id="convo-back" style="background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--accent);padding:0 0 .75rem;display:block">← All topics</button>
       <div id="convo-header">
         <h2 id="convo-list-title"></h2>
       </div>
@@ -1665,10 +1666,13 @@ function showTopicConversations(topic) {
   }
 }
 
-document.querySelector('[data-tab="topics"]').addEventListener('click', () => {
+function showTopicGrid() {
   document.getElementById('convo-list-card').style.display = 'none';
   document.getElementById('topic-grid-card').style.display = 'block';
-});
+}
+
+document.getElementById('convo-back').addEventListener('click', showTopicGrid);
+document.querySelector('[data-tab="topics"]').addEventListener('click', showTopicGrid);
 
 // ── Conversation drawer ───────────────────────────────────────────────────────
 
