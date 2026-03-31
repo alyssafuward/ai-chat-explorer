@@ -440,7 +440,7 @@
       padding: .6rem 0;
       border-bottom: 1px solid var(--border);
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: .75rem;
     }
     .dl-item:last-child { border-bottom: none; }
@@ -490,15 +490,6 @@
     }
 
     #convo-header h2 { font-size: 1rem; font-weight: 600; }
-    #convo-back {
-      font-size: .82rem;
-      color: var(--accent);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-    }
-    #convo-back:hover { text-decoration: underline; }
 
     /* ── Search ────────────────────────────────────── */
 
@@ -756,7 +747,7 @@
     You'll receive a <code>.zip</code> file — you can upload it directly, or extract it and upload the <code>conversations.json</code> file(s) inside.<br>
     <strong>Your data never leaves your browser.</strong>
   </p>
-  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2 · 2026-03-20 12:47</p>
+  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.1 · 2026-03-31 13:38</p>
 </div>
 
 <!-- ── Dashboard ──────────────────────────────────────────────────────────── -->
@@ -861,7 +852,7 @@
     <button class="tab-btn" data-tab="topics">🗺️ Topics</button>
     <button class="tab-btn" data-tab="search">🔍 Search</button>
     <button class="tab-btn" data-tab="timeline">📅 Timeline</button>
-    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Marked for Download</button>
+    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Marked for Download</button>
   </div>
 
   <!-- Overview -->
@@ -890,9 +881,9 @@
       <div id="topic-grid"></div>
     </div>
     <div class="card" id="convo-list-card" style="display:none">
+      <button id="convo-back" style="background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--accent);padding:0 0 .75rem;display:block">← All topics</button>
       <div id="convo-header">
         <h2 id="convo-list-title"></h2>
-        <button id="convo-back">← All topics</button>
       </div>
       <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> a conversation to mark it for download.</p>
       <div id="convo-list"></div>
@@ -919,13 +910,21 @@
   <div class="tab-panel" id="tab-downloads">
     <div class="intro-block">
       <h2>Marked for Download</h2>
-      <p>Conversations you've marked with ★ appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
+      <p>Conversations you've pinned <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
     </div>
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
         <h2>Ready to Download</h2>
-        <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
+        <button id="download-all-btn" disabled style="flex-shrink:0">⬇ Download All as ZIP</button>
       </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:.4rem">
+        <select id="download-sort" style="font-size:.78rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer">
+          <option value="pinned">Pinned order</option>
+          <option value="largest">Largest first</option>
+          <option value="smallest">Smallest first</option>
+        </select>
+      </div>
+      <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
       <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
       <div id="download-list"></div>
     </div>
@@ -951,7 +950,7 @@
 <footer>
   <span>Built by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></span>
   <span class="footer-divider">·</span>
-  <span>v2 · 2026-03-20 12:47</span>
+  <span>v2.1 · 2026-03-31 13:38</span>
 </footer>
 
 <!-- ── Conversation drawer ────────────────────────────────────────────────── -->
@@ -1633,6 +1632,28 @@ function showTopicConversations(topic) {
   const title = document.getElementById('convo-list-title');
   title.textContent = topic + ' · ' + convos.length + ' conversations';
 
+  // Select All / Deselect All button
+  const existingSelectBtn = document.getElementById('select-all-btn');
+  if (existingSelectBtn) existingSelectBtn.remove();
+  const selectBtn = document.createElement('button');
+  selectBtn.id = 'select-all-btn';
+  selectBtn.className = 'settings-btn';
+  selectBtn.style.cssText = 'font-size:.78rem;padding:.25rem .7rem';
+  const allMarked = () => convos.every(c => markedForDownload.has(c));
+  const updateSelectBtn = () => { selectBtn.textContent = allMarked() ? 'Deselect All' : 'Select All'; };
+  updateSelectBtn();
+  selectBtn.addEventListener('click', () => {
+    if (allMarked()) {
+      convos.forEach(c => { markedForDownload.delete(c); updateMarkUI(c); });
+    } else {
+      convos.forEach(c => { markedForDownload.add(c); updateMarkUI(c); });
+    }
+    updateSelectBtn();
+    renderDownloadsTab();
+    updateDownloadsBadge();
+  });
+  document.getElementById('convo-header').appendChild(selectBtn);
+
   const list = document.getElementById('convo-list');
   list.innerHTML = '';
   for (const c of convos) {
@@ -1652,10 +1673,13 @@ function showTopicConversations(topic) {
   }
 }
 
-document.getElementById('convo-back').addEventListener('click', () => {
+function showTopicGrid() {
   document.getElementById('convo-list-card').style.display = 'none';
   document.getElementById('topic-grid-card').style.display = 'block';
-});
+}
+
+document.getElementById('convo-back').addEventListener('click', showTopicGrid);
+document.querySelector('[data-tab="topics"]').addEventListener('click', showTopicGrid);
 
 // ── Conversation drawer ───────────────────────────────────────────────────────
 
@@ -1779,16 +1803,34 @@ function renderDownloadsTab() {
   const dlBtn = document.getElementById('download-all-btn');
   list.innerHTML = '';
 
+  const sizeEl = document.getElementById('download-size');
+
   if (markedForDownload.size === 0) {
     empty.style.display = 'block';
     dlBtn.disabled = true;
+    sizeEl.textContent = '';
     return;
   }
 
   empty.style.display = 'none';
   dlBtn.disabled = false;
 
-  for (const convo of markedForDownload) {
+  const sort = document.getElementById('download-sort').value;
+  const convos = [...markedForDownload].sort((a, b) => {
+    if (sort === 'largest' || sort === 'smallest') {
+      const sizeA = a.messages.reduce((s, m) => s + m.text.length, 0);
+      const sizeB = b.messages.reduce((s, m) => s + m.text.length, 0);
+      return sort === 'largest' ? sizeB - sizeA : sizeA - sizeB;
+    }
+    return 0;
+  });
+
+  const totalChars = convos.reduce((sum, c) => sum + c.messages.reduce((s, m) => s + m.text.length, 0), 0);
+  const totalKB = (totalChars / 1024).toFixed(0);
+  const sizeLabel = totalChars > 1024 * 1024 ? (totalChars / 1024 / 1024).toFixed(1) + ' MB' : totalKB + ' KB';
+  sizeEl.textContent = markedForDownload.size + ' conversation' + (markedForDownload.size !== 1 ? 's' : '') + ' · ~' + sizeLabel + ' estimated';
+
+  for (const convo of convos) {
     const item = document.createElement('div');
     item.className = 'dl-item';
 
@@ -1798,9 +1840,17 @@ function renderDownloadsTab() {
     title.style.cursor = 'pointer';
     title.addEventListener('click', () => openConversation(convo));
 
-    const meta = document.createElement('span');
+    const convoChars = convo.messages.reduce((s, m) => s + m.text.length, 0);
+    const convoSize = convoChars > 1024 * 1024 ? (convoChars / 1024 / 1024).toFixed(1) + ' MB' : Math.round(convoChars / 1024) + ' KB';
+
+    const meta = document.createElement('div');
     meta.className = 'dl-meta';
-    meta.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + convo.topic;
+    meta.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem';
+    const metaDate = document.createElement('span');
+    metaDate.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const metaTopic = document.createElement('span');
+    metaTopic.style.cssText = 'font-size:.72rem;color:var(--muted)';
+    metaTopic.textContent = convo.topic + ' · ' + convoSize;
 
     const remove = document.createElement('button');
     remove.className = 'dl-remove';
@@ -1808,6 +1858,8 @@ function renderDownloadsTab() {
     remove.title = 'Remove';
     remove.addEventListener('click', () => { markedForDownload.delete(convo); renderDownloadsTab(); updateMarkUI(convo); updateDownloadsBadge(); });
 
+    meta.appendChild(metaDate);
+    meta.appendChild(metaTopic);
     item.appendChild(title);
     item.appendChild(meta);
     item.appendChild(remove);
@@ -1839,6 +1891,7 @@ async function downloadAllMarked() {
 }
 
 document.getElementById('download-all-btn').addEventListener('click', downloadAllMarked);
+document.getElementById('download-sort').addEventListener('change', renderDownloadsTab);
 
 function downloadConversation(convo) {
   const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -2076,11 +2129,15 @@ function refreshSettingsUI() {
       const status = document.getElementById('settings-save-status');
       const clearBtn = document.getElementById('clear-data-btn');
       if (savedAt) {
-        status.textContent = 'Last saved: ' + new Date(savedAt).toLocaleString();
+        const sizeMB = hasCurrent ? (JSON.stringify(allConversations).length / 1024 / 1024).toFixed(1) : '?';
+        status.textContent = 'Last saved: ' + new Date(savedAt).toLocaleString() + ' · ~' + sizeMB + ' MB in browser storage';
         clearBtn.disabled = false;
         document.getElementById('autosave-toggle').checked = true;
       } else {
-        status.textContent = 'No data saved in this browser.';
+        const sizeMB = hasCurrent ? (JSON.stringify(allConversations).length / 1024 / 1024).toFixed(1) : null;
+        status.textContent = sizeMB
+          ? 'No data saved. Current dataset is ~' + sizeMB + ' MB.'
+          : 'No data saved in this browser.';
         clearBtn.disabled = true;
       }
     };
