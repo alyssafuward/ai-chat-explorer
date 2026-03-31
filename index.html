@@ -1829,6 +1829,9 @@ function renderDownloadsTab() {
     title.style.cursor = 'pointer';
     title.addEventListener('click', () => openConversation(convo));
 
+    const convoChars = convo.messages.reduce((s, m) => s + m.text.length, 0);
+    const convoSize = convoChars > 1024 * 1024 ? (convoChars / 1024 / 1024).toFixed(1) + ' MB' : Math.round(convoChars / 1024) + ' KB';
+
     const meta = document.createElement('div');
     meta.className = 'dl-meta';
     meta.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem';
@@ -1836,7 +1839,7 @@ function renderDownloadsTab() {
     metaDate.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const metaTopic = document.createElement('span');
     metaTopic.style.cssText = 'font-size:.72rem;color:var(--muted)';
-    metaTopic.textContent = convo.topic;
+    metaTopic.textContent = convo.topic + ' · ' + convoSize;
 
     const remove = document.createElement('button');
     remove.className = 'dl-remove';
