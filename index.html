@@ -914,7 +914,14 @@
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-        <h2>Ready to Download</h2>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <h2>Ready to Download</h2>
+          <select id="download-sort" style="font-size:.78rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer">
+            <option value="pinned">Pinned order</option>
+            <option value="largest">Largest first</option>
+            <option value="smallest">Smallest first</option>
+          </select>
+        </div>
         <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
       </div>
       <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
@@ -1808,12 +1815,22 @@ function renderDownloadsTab() {
   empty.style.display = 'none';
   dlBtn.disabled = false;
 
-  const totalChars = [...markedForDownload].reduce((sum, c) => sum + c.messages.reduce((s, m) => s + m.text.length, 0), 0);
+  const sort = document.getElementById('download-sort').value;
+  const convos = [...markedForDownload].sort((a, b) => {
+    if (sort === 'largest' || sort === 'smallest') {
+      const sizeA = a.messages.reduce((s, m) => s + m.text.length, 0);
+      const sizeB = b.messages.reduce((s, m) => s + m.text.length, 0);
+      return sort === 'largest' ? sizeB - sizeA : sizeA - sizeB;
+    }
+    return 0;
+  });
+
+  const totalChars = convos.reduce((sum, c) => sum + c.messages.reduce((s, m) => s + m.text.length, 0), 0);
   const totalKB = (totalChars / 1024).toFixed(0);
   const sizeLabel = totalChars > 1024 * 1024 ? (totalChars / 1024 / 1024).toFixed(1) + ' MB' : totalKB + ' KB';
   sizeEl.textContent = markedForDownload.size + ' conversation' + (markedForDownload.size !== 1 ? 's' : '') + ' · ~' + sizeLabel + ' estimated';
 
-  for (const convo of markedForDownload) {
+  for (const convo of convos) {
     const item = document.createElement('div');
     item.className = 'dl-item';
 
@@ -1874,6 +1891,7 @@ async function downloadAllMarked() {
 }
 
 document.getElementById('download-all-btn').addEventListener('click', downloadAllMarked);
+document.getElementById('download-sort').addEventListener('change', renderDownloadsTab);
 
 function downloadConversation(convo) {
   const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
