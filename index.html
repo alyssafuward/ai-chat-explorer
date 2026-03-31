@@ -913,16 +913,16 @@
       <p>Conversations you've pinned <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
     </div>
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-        <div style="display:flex;align-items:center;gap:.75rem">
-          <h2>Ready to Download</h2>
-          <select id="download-sort" style="font-size:.78rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer">
-            <option value="pinned">Pinned order</option>
-            <option value="largest">Largest first</option>
-            <option value="smallest">Smallest first</option>
-          </select>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+        <h2>Ready to Download</h2>
         <button id="download-all-btn" disabled style="flex-shrink:0">⬇ Download All as ZIP</button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:.4rem">
+        <select id="download-sort" style="font-size:.78rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer">
+          <option value="pinned">Pinned order</option>
+          <option value="largest">Largest first</option>
+          <option value="smallest">Smallest first</option>
+        </select>
       </div>
       <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
       <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
