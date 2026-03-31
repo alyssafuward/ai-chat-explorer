@@ -270,14 +270,37 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 1rem;
       color: var(--muted);
       padding: 0 .25rem;
       line-height: 1;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
     }
     .mark-btn:hover { color: var(--accent); }
     .mark-btn.marked { color: var(--accent); }
+
+    /* ── Search topic filter ───────────────────────── */
+
+    #search-filter-row {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: 1.2rem;
+      align-items: center;
+    }
+    #search-input { margin-bottom: 0; flex: 1; }
+    #search-topic-filter {
+      padding: .82rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: .9rem;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    #search-topic-filter:focus { border-color: var(--accent2); }
 
     /* ── Downloads tab ─────────────────────────────── */
 
@@ -691,7 +714,12 @@
       <h2>Search Your Conversations</h2>
       <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember.</p>
     </div>
-    <input type="search" id="search-input" placeholder="Try a keyword, topic, or phrase…" autocomplete="off" />
+    <div id="search-filter-row">
+      <input type="search" id="search-input" placeholder="Try a keyword, topic, or phrase…" autocomplete="off" />
+      <select id="search-topic-filter">
+        <option value="">All Topics</option>
+      </select>
+    </div>
     <div id="search-count"></div>
     <div id="search-results"></div>
   </div>
@@ -704,7 +732,7 @@
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-        <h2>Marked Conversations</h2>
+        <h2>Ready to Download</h2>
         <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
       </div>
       <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
@@ -742,7 +770,7 @@
     <div id="drawer-header">
       <button id="drawer-close">✕</button>
       <button id="drawer-download" title="Download conversation">⬇</button>
-      <button id="drawer-mark" title="Mark for download">★</button>
+      <button id="drawer-mark" title="Mark for download"></button>
       <div id="drawer-title"></div>
       <div id="drawer-meta"></div>
     </div>
@@ -1123,6 +1151,21 @@ function buildDashboard() {
   document.getElementById('upload-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
 
+  // Populate search topic filter
+  const topicFilter = document.getElementById('search-topic-filter');
+  topicFilter.innerHTML = '<option value="">All Topics</option>';
+  const topics = [...new Set(allConversations.map(c => c.topic))].sort();
+  topics.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    topicFilter.appendChild(opt);
+  });
+  topicFilter.addEventListener('change', () => {
+    const query = document.getElementById('search-input').value.trim();
+    runSearch(query);
+  });
+
   const total = allConversations.length;
   const first = allConversations[0].date;
   const last  = allConversations[allConversations.length - 1].date;
@@ -1446,8 +1489,10 @@ function openConversation(convo) {
   document.getElementById('drawer-download').onclick = () => downloadConversation(convo);
   const drawerMark = document.getElementById('drawer-mark');
   drawerMark._convo = convo;
-  drawerMark.classList.toggle('marked', markedForDownload.has(convo));
-  drawerMark.title = markedForDownload.has(convo) ? 'Remove from downloads' : 'Mark for download';
+  const isMarked = markedForDownload.has(convo);
+  drawerMark.classList.toggle('marked', isMarked);
+  drawerMark.innerHTML = bookmarkSVG(isMarked);
+  drawerMark.title = isMarked ? 'Remove from downloads' : 'Mark for download';
   drawerMark.onclick = () => toggleMark(convo);
 
   overlay.classList.add('open');
@@ -1482,7 +1527,7 @@ function updateMarkUI(convo) {
   document.querySelectorAll('.mark-btn').forEach(btn => {
     if (btn._convo === convo) {
       btn.classList.toggle('marked', marked);
-      btn.textContent = marked ? '★' : '☆';
+      btn.innerHTML = bookmarkSVG(marked);
       btn.title = marked ? 'Remove from downloads' : 'Mark for download';
     }
   });
@@ -1500,11 +1545,18 @@ function updateDownloadsBadge() {
   }
 }
 
+function bookmarkSVG(filled) {
+  return `<svg width="13" height="16" viewBox="0 0 13 16" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+    <path d="M1.5 1.5h10v13l-5-3-5 3V1.5z"/>
+  </svg>`;
+}
+
 function makeMarkBtn(convo) {
   const btn = document.createElement('button');
-  btn.className = 'mark-btn' + (markedForDownload.has(convo) ? ' marked' : '');
-  btn.textContent = markedForDownload.has(convo) ? '★' : '☆';
-  btn.title = markedForDownload.has(convo) ? 'Remove from downloads' : 'Mark for download';
+  const marked = markedForDownload.has(convo);
+  btn.className = 'mark-btn' + (marked ? ' marked' : '');
+  btn.innerHTML = bookmarkSVG(marked);
+  btn.title = marked ? 'Remove from downloads' : 'Mark for download';
   btn._convo = convo;
   btn.addEventListener('click', e => { e.stopPropagation(); toggleMark(convo); });
   return btn;
@@ -1649,14 +1701,23 @@ function runSearch(query) {
   const results = document.getElementById('search-results');
   results.innerHTML = '';
 
-  if (!query) { count.textContent = ''; return; }
+  const topicFilter = document.getElementById('search-topic-filter').value;
 
-  const matches = allConversations.filter(c =>
-    c.title.toLowerCase().includes(query.toLowerCase()) ||
-    c.fullText.toLowerCase().includes(query.toLowerCase())
-  ).sort((a, b) => b.date - a.date);
+  if (!query && !topicFilter) { count.textContent = ''; return; }
 
-  count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + query + '"';
+  const q = query.toLowerCase();
+  const matches = allConversations.filter(c => {
+    const topicMatch = !topicFilter || c.topic === topicFilter;
+    const textMatch = !query ||
+      c.title.toLowerCase().includes(q) ||
+      c.fullText.toLowerCase().includes(q);
+    return topicMatch && textMatch;
+  }).sort((a, b) => b.date - a.date);
+
+  const countParts = [];
+  if (query) countParts.push(`"${query}"`);
+  if (topicFilter) countParts.push(topicFilter);
+  count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + (countParts.length ? ' for ' + countParts.join(' in ') : '');
 
   for (const c of matches.slice(0, 50)) {
     const item = document.createElement('div');
@@ -1759,6 +1820,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   activeTimelineTopics.clear();
   markedForDownload.clear();
   updateDownloadsBadge();
+  document.getElementById('search-topic-filter').innerHTML = '<option value="">All Topics</option>';
   [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
