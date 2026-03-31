@@ -125,6 +125,8 @@
     header h1 { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
     header span { font-size: .85rem; color: var(--muted); }
 
+    #header-right { display: flex; align-items: center; gap: .6rem; }
+
     #reset-btn {
       font-size: .8rem;
       color: var(--muted);
@@ -135,6 +137,134 @@
       cursor: pointer;
     }
     #reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    #settings-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .3rem .5rem;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+    }
+    #settings-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Settings modal ────────────────────────────── */
+
+    #settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 500;
+    }
+    #settings-overlay.open { display: flex; align-items: flex-start; justify-content: flex-end; }
+
+    #settings-panel {
+      background: var(--surface);
+      width: 380px;
+      max-width: 95vw;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: -4px 0 24px rgba(0,0,0,.12);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    #settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .5rem;
+    }
+    #settings-header h2 { font-size: 1rem; font-weight: 700; }
+    #settings-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    #settings-close:hover { color: var(--text); }
+
+    .settings-section {
+      border-top: 1px solid var(--border);
+      padding-top: 1.2rem;
+    }
+    .settings-section h3 {
+      font-size: .82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .9rem;
+      gap: 1rem;
+    }
+    .settings-row-label { font-size: .88rem; color: var(--text); }
+    .settings-row-sub { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
+
+    .settings-btn {
+      font-size: .8rem;
+      padding: .35rem .9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text);
+    }
+    .settings-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .settings-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .settings-btn.primary:hover { opacity: .88; color: #fff; }
+    .settings-btn.danger { color: #c00; border-color: #c00; }
+    .settings-btn.danger:hover { background: #c00; color: #fff; }
+    .settings-btn:disabled { opacity: .4; cursor: default; }
+
+    .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform .2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+    #settings-save-status {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: -.4rem;
+      margin-bottom: .4rem;
+    }
 
     /* ── Stats bar ─────────────────────────────────── */
 
@@ -635,8 +765,69 @@
   <header>
     <h1>ChatGPT Explorer</h1>
     <span id="header-range"></span>
-    <button id="reset-btn">← Load new files</button>
+    <div id="header-right">
+      <button id="reset-btn">← Load new files</button>
+      <button id="settings-btn" title="Settings">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
   </header>
+
+  <!-- Settings panel -->
+  <div id="settings-overlay">
+    <div id="settings-panel">
+      <div id="settings-header">
+        <h2>Settings</h2>
+        <button id="settings-close">✕</button>
+      </div>
+
+      <!-- Browser Storage -->
+      <div class="settings-section">
+        <h3>Browser Storage</h3>
+        <div id="settings-save-status">No data saved.</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Save data in browser</div>
+            <div class="settings-row-sub">Saves now and on every future upload so you can reload instantly</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autosave-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Clear saved data</div>
+            <div class="settings-row-sub">Removes all stored conversations from this browser</div>
+          </div>
+          <button class="settings-btn danger" id="clear-data-btn" disabled>Clear</button>
+        </div>
+        <div class="settings-row-sub" style="margin-top:-.4rem">Data is stored locally in this browser only and is never transmitted anywhere.</div>
+      </div>
+
+      <!-- Export -->
+      <div class="settings-section">
+        <h3>Export</h3>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Export conversations</div>
+            <div class="settings-row-sub">Download your parsed conversations as JSON. This is a simplified format — it can be re-uploaded here but is not the same as your original ChatGPT export.</div>
+          </div>
+          <button class="settings-btn" id="export-data-btn" disabled>Export</button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Export topics</div>
+            <div class="settings-row-sub">Download the topic taxonomy as JSON</div>
+          </div>
+          <button class="settings-btn" id="export-topics-btn">Export</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <div class="intro-block" style="padding-left:2rem;padding-right:2rem;max-width:1100px;margin:0 auto;">
     <h2>Welcome to your ChatGPT Conversation Explorer</h2>
@@ -1098,6 +1289,20 @@ async function parseFiles(files) {
       }
     }
 
+    // Detect re-import of a previously exported file (has our format: date string + messages array, no create_time)
+    if (raw.length > 0 && raw[0].date && raw[0].messages && !raw[0].create_time) {
+      allConversations = raw.map(c => ({
+        ...c,
+        date: new Date(c.date),
+        monthKey: new Date(c.date).toISOString().slice(0, 7),
+        monthLabel: new Date(c.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        userText: c.messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
+        fullText: c.messages.map(m => m.text).join(' '),
+      })).sort((a, b) => a.date - b.date);
+      buildDashboard();
+      return;
+    }
+
     // Pass 1: parse structure
     const parsed = raw
       .filter(c => c && c.create_time)
@@ -1150,6 +1355,11 @@ async function parseFiles(files) {
 function buildDashboard() {
   document.getElementById('upload-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
+
+  // Auto-save if toggle is on
+  if (document.getElementById('autosave-toggle').checked) {
+    saveToIndexedDB();
+  }
 
   // Populate search topic filter
   const topicFilter = document.getElementById('search-topic-filter');
@@ -1838,6 +2048,182 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   });
   document.getElementById('search-input').value = '';
 });
+
+// ── Settings panel ────────────────────────────────────────────────────────────
+
+document.getElementById('settings-btn').addEventListener('click', () => {
+  document.getElementById('settings-overlay').classList.add('open');
+  refreshSettingsUI();
+});
+document.getElementById('settings-close').addEventListener('click', closeSettings);
+document.getElementById('settings-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('settings-overlay')) closeSettings();
+});
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+
+function refreshSettingsUI() {
+  const hasCurrent = allConversations.length > 0;
+  document.getElementById('export-data-btn').disabled = !hasCurrent;
+
+  getDB().then(db => {
+    const tx = db.transaction('meta', 'readonly');
+    const req = tx.objectStore('meta').get('savedAt');
+    req.onsuccess = () => {
+      const savedAt = req.result;
+      const status = document.getElementById('settings-save-status');
+      const clearBtn = document.getElementById('clear-data-btn');
+      if (savedAt) {
+        status.textContent = 'Last saved: ' + new Date(savedAt).toLocaleString();
+        clearBtn.disabled = false;
+        document.getElementById('autosave-toggle').checked = true;
+      } else {
+        status.textContent = 'No data saved in this browser.';
+        clearBtn.disabled = true;
+      }
+    };
+  });
+}
+
+// ── IndexedDB ─────────────────────────────────────────────────────────────────
+
+const DB_NAME = 'chatgpt-explorer';
+const DB_VERSION = 1;
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('conversations')) db.createObjectStore('conversations', { keyPath: '_idx' });
+      if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta');
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function saveToIndexedDB() {
+  const db = await getDB();
+  const tx = db.transaction(['conversations', 'meta'], 'readwrite');
+  const store = tx.objectStore('conversations');
+  store.clear();
+  allConversations.forEach((c, i) => {
+    store.put({ ...c, _idx: i, date: c.date.toISOString() });
+  });
+  tx.objectStore('meta').put(Date.now(), 'savedAt');
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => { resolve(); refreshSettingsUI(); };
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+
+async function loadFromIndexedDB() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['conversations', 'meta'], 'readonly');
+    const req = tx.objectStore('conversations').getAll();
+    const metaReq = tx.objectStore('meta').get('savedAt');
+    req.onsuccess = () => {
+      metaReq.onsuccess = () => {
+        resolve({ conversations: req.result, savedAt: metaReq.result });
+      };
+    };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function clearIndexedDB() {
+  const db = await getDB();
+  const tx = db.transaction(['conversations', 'meta'], 'readwrite');
+  tx.objectStore('conversations').clear();
+  tx.objectStore('meta').delete('savedAt');
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => { resolve(); refreshSettingsUI(); };
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+
+document.getElementById('autosave-toggle').addEventListener('change', async function () {
+  if (this.checked && allConversations.length > 0) {
+    await saveToIndexedDB();
+  } else if (!this.checked) {
+    await clearIndexedDB();
+  }
+});
+
+document.getElementById('clear-data-btn').addEventListener('click', async () => {
+  if (!confirm('Clear all saved data from this browser?')) return;
+  await clearIndexedDB();
+  document.getElementById('autosave-toggle').checked = false;
+});
+
+// ── Check for saved data on load ──────────────────────────────────────────────
+
+(async () => {
+  try {
+    const { conversations, savedAt } = await loadFromIndexedDB();
+    if (!conversations || conversations.length === 0) return;
+
+    const dz = document.getElementById('drop-zone');
+    const saved = new Date(savedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    dz.innerHTML = `
+      <div class="icon">💬</div>
+      <p><strong>${conversations.length} conversations</strong> saved from ${saved}</p>
+      <p style="margin-top:.75rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+        <button id="load-saved-btn" style="padding:.5rem 1.2rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600">Load saved data</button>
+        <button id="upload-new-btn" style="padding:.5rem 1.2rem;background:none;color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.9rem">Upload new file</button>
+      </p>
+    `;
+    document.getElementById('load-saved-btn').addEventListener('click', () => {
+      allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
+      buildDashboard();
+    });
+    document.getElementById('upload-new-btn').addEventListener('click', () => {
+      dz.innerHTML = `
+        <div class="icon">💬</div>
+        <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
+        <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
+        <input type="file" id="file-input" accept=".zip,.json" multiple />
+      `;
+      document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
+      document.getElementById('file-input').addEventListener('change', () => {
+        const fi = document.getElementById('file-input');
+        if (fi.files.length) parseFiles(fi.files);
+      });
+    });
+  } catch (e) {
+    // No saved data or IndexedDB unavailable — proceed normally
+  }
+})();
+
+// ── Exports ───────────────────────────────────────────────────────────────────
+
+document.getElementById('export-data-btn').addEventListener('click', () => {
+  const exportable = allConversations.map(c => ({
+    title: c.title,
+    date: c.date.toISOString(),
+    topic: c.topic,
+    messages: c.messages
+  }));
+  downloadJSON(exportable, 'chatgpt_conversations.json');
+});
+
+document.getElementById('export-topics-btn').addEventListener('click', () => {
+  downloadJSON(TOPICS, 'chatgpt_explorer_topics.json');
+});
+
+function downloadJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
