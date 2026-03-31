@@ -926,6 +926,7 @@
         <h2>Ready to Download</h2>
         <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
       </div>
+      <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
       <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
       <div id="download-list"></div>
     </div>
@@ -1801,14 +1802,22 @@ function renderDownloadsTab() {
   const dlBtn = document.getElementById('download-all-btn');
   list.innerHTML = '';
 
+  const sizeEl = document.getElementById('download-size');
+
   if (markedForDownload.size === 0) {
     empty.style.display = 'block';
     dlBtn.disabled = true;
+    sizeEl.textContent = '';
     return;
   }
 
   empty.style.display = 'none';
   dlBtn.disabled = false;
+
+  const totalChars = [...markedForDownload].reduce((sum, c) => sum + c.messages.reduce((s, m) => s + m.text.length, 0), 0);
+  const totalKB = (totalChars / 1024).toFixed(0);
+  const sizeLabel = totalChars > 1024 * 1024 ? (totalChars / 1024 / 1024).toFixed(1) + ' MB' : totalKB + ' KB';
+  sizeEl.textContent = markedForDownload.size + ' conversation' + (markedForDownload.size !== 1 ? 's' : '') + ' · ~' + sizeLabel + ' estimated';
 
   for (const convo of markedForDownload) {
     const item = document.createElement('div');
