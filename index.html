@@ -263,8 +263,94 @@
 
     .convo-item:last-child { border-bottom: none; }
 
-    .convo-title { font-size: .9rem; color: var(--text); }
+    .convo-title { font-size: .9rem; color: var(--text); flex: 1; }
     .convo-date { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+
+    .mark-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 0 .25rem;
+      line-height: 1;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .mark-btn:hover { color: var(--accent); }
+    .mark-btn.marked { color: var(--accent); }
+
+    /* ── Search topic filter ───────────────────────── */
+
+    #search-filter-row {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: 1.2rem;
+      align-items: center;
+    }
+    #search-input { margin-bottom: 0 !important; flex: 1; align-self: stretch; }
+    #search-topic-filter {
+      padding: .82rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: .9rem;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    #search-topic-filter:focus { border-color: var(--accent2); }
+
+    /* ── Downloads tab ─────────────────────────────── */
+
+    #download-list { margin-top: 1rem; }
+
+    .dl-item {
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: .75rem;
+    }
+    .dl-item:last-child { border-bottom: none; }
+    .dl-title { font-size: .9rem; color: var(--text); flex: 1; }
+    .dl-meta { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+    .dl-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: .85rem;
+      color: var(--muted);
+      padding: 0;
+    }
+    .dl-remove:hover { color: #c00; }
+
+    #download-all-btn {
+      margin-top: 1.2rem;
+      padding: .6rem 1.4rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #download-all-btn:hover { opacity: .88; }
+    #download-all-btn:disabled { opacity: .4; cursor: default; }
+
+    .tab-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: .05rem .4rem;
+      margin-left: .35rem;
+      vertical-align: middle;
+    }
 
     #convo-header {
       display: flex;
@@ -427,7 +513,7 @@
       flex-shrink: 0;
     }
 
-    #drawer-close {
+    #drawer-close, #drawer-download, #drawer-mark {
       float: right;
       background: none;
       border: none;
@@ -437,7 +523,9 @@
       line-height: 1;
       margin-left: .5rem;
     }
-    #drawer-close:hover { color: var(--text); }
+    #drawer-close:hover, #drawer-download:hover { color: var(--text); }
+    #drawer-mark:hover { color: var(--accent); }
+    #drawer-mark.marked { color: var(--accent); }
 
     #drawer-title {
       font-size: 1rem;
@@ -582,6 +670,7 @@
     <button class="tab-btn" data-tab="topics">🗺️ Topics</button>
     <button class="tab-btn" data-tab="search">🔍 Search</button>
     <button class="tab-btn" data-tab="timeline">📅 Timeline</button>
+    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Marked for Download</button>
   </div>
 
   <!-- Overview -->
@@ -614,7 +703,7 @@
         <h2 id="convo-list-title"></h2>
         <button id="convo-back">← All topics</button>
       </div>
-      <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread.</p>
+      <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> a conversation to mark it for download.</p>
       <div id="convo-list"></div>
     </div>
   </div>
@@ -623,11 +712,32 @@
   <div class="tab-panel" id="tab-search">
     <div class="intro-block">
       <h2>Search Your Conversations</h2>
-      <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember.</p>
+      <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> any result to mark it for download.</p>
     </div>
-    <input type="search" id="search-input" placeholder="Try a keyword, topic, or phrase…" autocomplete="off" />
+    <div id="search-filter-row">
+      <input type="search" id="search-input" placeholder="Try a keyword, topic, or phrase…" autocomplete="off" />
+      <select id="search-topic-filter">
+        <option value="">All Topics</option>
+      </select>
+    </div>
     <div id="search-count"></div>
     <div id="search-results"></div>
+  </div>
+
+  <!-- Downloads -->
+  <div class="tab-panel" id="tab-downloads">
+    <div class="intro-block">
+      <h2>Marked for Download</h2>
+      <p>Conversations you've marked with ★ appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <h2>Ready to Download</h2>
+        <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
+      </div>
+      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
+      <div id="download-list"></div>
+    </div>
   </div>
 
   <!-- Timeline -->
@@ -659,6 +769,8 @@
   <div id="drawer">
     <div id="drawer-header">
       <button id="drawer-close">✕</button>
+      <button id="drawer-download" title="Download conversation">⬇</button>
+      <button id="drawer-mark" title="Mark for download"></button>
       <div id="drawer-title"></div>
       <div id="drawer-meta"></div>
     </div>
@@ -1039,6 +1151,21 @@ function buildDashboard() {
   document.getElementById('upload-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
 
+  // Populate search topic filter
+  const topicFilter = document.getElementById('search-topic-filter');
+  topicFilter.innerHTML = '<option value="">All Topics</option>';
+  const topics = [...new Set(allConversations.map(c => c.topic))].sort();
+  topics.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    topicFilter.appendChild(opt);
+  });
+  topicFilter.addEventListener('change', () => {
+    const query = document.getElementById('search-input').value.trim();
+    runSearch(query);
+  });
+
   const total = allConversations.length;
   const first = allConversations[0].date;
   const last  = allConversations[allConversations.length - 1].date;
@@ -1309,7 +1436,8 @@ function showTopicConversations(topic) {
     d.textContent = c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     item.appendChild(t);
     item.appendChild(d);
-    item.addEventListener('click', () => openConversation(c));
+    item.appendChild(makeMarkBtn(c));
+    item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
     list.appendChild(item);
   }
 }
@@ -1358,9 +1486,167 @@ function openConversation(convo) {
     }
   }
 
+  document.getElementById('drawer-download').onclick = () => downloadConversation(convo);
+  const drawerMark = document.getElementById('drawer-mark');
+  drawerMark._convo = convo;
+  const isMarked = markedForDownload.has(convo);
+  drawerMark.classList.toggle('marked', isMarked);
+  drawerMark.innerHTML = bookmarkSVG(isMarked);
+  drawerMark.title = isMarked ? 'Remove from downloads' : 'Mark for download';
+  drawerMark.onclick = () => toggleMark(convo);
+
   overlay.classList.add('open');
   msgsEl.scrollTop = 0;
   document.body.style.overflow = 'hidden';
+}
+
+// ── Mark for download ────────────────────────────────────────────────────────
+
+const markedForDownload = new Set();
+
+function toggleMark(convo) {
+  if (markedForDownload.has(convo)) {
+    markedForDownload.delete(convo);
+  } else {
+    markedForDownload.add(convo);
+  }
+  updateMarkUI(convo);
+  renderDownloadsTab();
+  updateDownloadsBadge();
+}
+
+function updateMarkUI(convo) {
+  const marked = markedForDownload.has(convo);
+  // Update drawer mark button if this convo is open
+  const drawerMark = document.getElementById('drawer-mark');
+  if (drawerMark && drawerMark._convo === convo) {
+    drawerMark.classList.toggle('marked', marked);
+    drawerMark.title = marked ? 'Remove from downloads' : 'Mark for download';
+  }
+  // Update all mark buttons in lists
+  document.querySelectorAll('.mark-btn').forEach(btn => {
+    if (btn._convo === convo) {
+      btn.classList.toggle('marked', marked);
+      btn.innerHTML = bookmarkSVG(marked);
+      btn.title = marked ? 'Remove from downloads' : 'Mark for download';
+    }
+  });
+}
+
+function updateDownloadsBadge() {
+  const btn = document.getElementById('downloads-tab-btn');
+  const existing = btn.querySelector('.tab-badge');
+  if (existing) existing.remove();
+  if (markedForDownload.size > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'tab-badge';
+    badge.textContent = markedForDownload.size;
+    btn.appendChild(badge);
+  }
+}
+
+function bookmarkSVG(filled) {
+  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="17" x2="12" y2="22"/>
+    <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
+  </svg>`;
+}
+
+function makeMarkBtn(convo) {
+  const btn = document.createElement('button');
+  const marked = markedForDownload.has(convo);
+  btn.className = 'mark-btn' + (marked ? ' marked' : '');
+  btn.innerHTML = bookmarkSVG(marked);
+  btn.title = marked ? 'Remove from downloads' : 'Mark for download';
+  btn._convo = convo;
+  btn.addEventListener('click', e => { e.stopPropagation(); toggleMark(convo); });
+  return btn;
+}
+
+function renderDownloadsTab() {
+  const list = document.getElementById('download-list');
+  const empty = document.getElementById('download-empty');
+  const dlBtn = document.getElementById('download-all-btn');
+  list.innerHTML = '';
+
+  if (markedForDownload.size === 0) {
+    empty.style.display = 'block';
+    dlBtn.disabled = true;
+    return;
+  }
+
+  empty.style.display = 'none';
+  dlBtn.disabled = false;
+
+  for (const convo of markedForDownload) {
+    const item = document.createElement('div');
+    item.className = 'dl-item';
+
+    const title = document.createElement('span');
+    title.className = 'dl-title';
+    title.textContent = convo.title;
+    title.style.cursor = 'pointer';
+    title.addEventListener('click', () => openConversation(convo));
+
+    const meta = document.createElement('span');
+    meta.className = 'dl-meta';
+    meta.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + convo.topic;
+
+    const remove = document.createElement('button');
+    remove.className = 'dl-remove';
+    remove.textContent = '✕';
+    remove.title = 'Remove';
+    remove.addEventListener('click', () => { markedForDownload.delete(convo); renderDownloadsTab(); updateMarkUI(convo); updateDownloadsBadge(); });
+
+    item.appendChild(title);
+    item.appendChild(meta);
+    item.appendChild(remove);
+    list.appendChild(item);
+  }
+}
+
+async function downloadAllMarked() {
+  const zip = new JSZip();
+  for (const convo of markedForDownload) {
+    const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const lines = [convo.title, `${date} · ${convo.topic}`, '', '---', ''];
+    for (const msg of convo.messages) {
+      if (!['user', 'assistant'].includes(msg.role)) continue;
+      lines.push(msg.role === 'user' ? 'You:' : 'ChatGPT:');
+      lines.push(msg.text);
+      lines.push('');
+    }
+    const filename = convo.title.replace(/[^a-z0-9 _-]/gi, '').trim().replace(/\s+/g, '_').slice(0, 60) + '.txt';
+    zip.file(filename, lines.join('\n'));
+  }
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'chatgpt_conversations.zip';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('download-all-btn').addEventListener('click', downloadAllMarked);
+
+function downloadConversation(convo) {
+  const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const lines = [`${convo.title}`, `${date} · ${convo.topic}`, '', '---', ''];
+  for (const msg of convo.messages) {
+    if (!['user', 'assistant'].includes(msg.role)) continue;
+    const speaker = msg.role === 'user' ? 'You' : 'ChatGPT';
+    lines.push(`${speaker}:`);
+    lines.push(msg.text);
+    lines.push('');
+  }
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = convo.title.replace(/[^a-z0-9 _-]/gi, '').trim().replace(/\s+/g, '_').slice(0, 60) + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function closeDrawer() {
@@ -1416,14 +1702,23 @@ function runSearch(query) {
   const results = document.getElementById('search-results');
   results.innerHTML = '';
 
-  if (!query) { count.textContent = ''; return; }
+  const topicFilter = document.getElementById('search-topic-filter').value;
 
-  const matches = allConversations.filter(c =>
-    c.title.toLowerCase().includes(query.toLowerCase()) ||
-    c.fullText.toLowerCase().includes(query.toLowerCase())
-  ).sort((a, b) => b.date - a.date);
+  if (!query && !topicFilter) { count.textContent = ''; return; }
 
-  count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + query + '"';
+  const q = query.toLowerCase();
+  const matches = allConversations.filter(c => {
+    const topicMatch = !topicFilter || c.topic === topicFilter;
+    const textMatch = !query ||
+      c.title.toLowerCase().includes(q) ||
+      c.fullText.toLowerCase().includes(q);
+    return topicMatch && textMatch;
+  }).sort((a, b) => b.date - a.date);
+
+  const countParts = [];
+  if (query) countParts.push(`"${query}"`);
+  if (topicFilter) countParts.push(topicFilter);
+  count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + (countParts.length ? ' for ' + countParts.join(' in ') : '');
 
   for (const c of matches.slice(0, 50)) {
     const item = document.createElement('div');
@@ -1448,7 +1743,12 @@ function runSearch(query) {
       item.appendChild(rsnip);
     }
 
-    item.addEventListener('click', () => openConversation(c));
+    const markWrap = document.createElement('div');
+    markWrap.style.cssText = 'display:flex;justify-content:flex-end;margin-top:.5rem';
+    markWrap.appendChild(makeMarkBtn(c));
+    item.appendChild(markWrap);
+
+    item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
     results.appendChild(item);
   }
 
@@ -1519,6 +1819,9 @@ dropZone.addEventListener('drop', e => {
 document.getElementById('reset-btn').addEventListener('click', () => {
   allConversations = [];
   activeTimelineTopics.clear();
+  markedForDownload.clear();
+  updateDownloadsBadge();
+  document.getElementById('search-topic-filter').innerHTML = '<option value="">All Topics</option>';
   [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
