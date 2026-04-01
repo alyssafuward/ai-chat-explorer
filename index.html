@@ -127,6 +127,13 @@
 
     #header-right { display: flex; align-items: center; gap: .6rem; }
 
+    #save-status-pill {
+      font-size: .72rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    #save-status-pill.saved { color: #5a9a5a; }
+
     #reset-btn {
       font-size: .8rem;
       color: var(--muted);
@@ -885,6 +892,7 @@
     <h1>ChatGPT Explorer</h1>
     <span id="header-range"></span>
     <div id="header-right">
+      <span id="save-status-pill"></span>
       <button id="reset-btn">← Add / manage files</button>
       <button id="settings-btn" title="Settings">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1579,6 +1587,7 @@ function buildDashboard() {
   if (document.getElementById('autosave-toggle').checked) {
     saveToIndexedDB();
   }
+  refreshSaveStatusPill();
 
   // Populate search topic filter
   const topicFilter = document.getElementById('search-topic-filter');
@@ -2399,7 +2408,26 @@ function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
 }
 
+function refreshSaveStatusPill() {
+  const pill = document.getElementById('save-status-pill');
+  if (!pill) return;
+  getDB().then(db => {
+    const tx = db.transaction('meta', 'readonly');
+    const req = tx.objectStore('meta').get('savedAt');
+    req.onsuccess = () => {
+      if (req.result) {
+        pill.textContent = '✓ Saved in browser';
+        pill.className = 'saved';
+      } else {
+        pill.textContent = 'Not saved — closes with tab';
+        pill.className = '';
+      }
+    };
+  }).catch(() => { pill.textContent = ''; });
+}
+
 function refreshSettingsUI() {
+  refreshSaveStatusPill();
   const hasCurrent = allConversations.length > 0;
   document.getElementById('export-data-btn').disabled = !hasCurrent;
 
