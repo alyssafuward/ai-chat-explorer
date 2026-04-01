@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatGPT Conversation Explorer</title>
+  <title>ChatGPT Explorer</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
           integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g"
           crossorigin="anonymous"></script>
@@ -793,7 +793,7 @@
 <!-- ── Upload screen ──────────────────────────────────────────────────────── -->
 
 <div id="upload-screen">
-  <h1>ChatGPT Conversation Explorer</h1>
+  <h1>ChatGPT Explorer</h1>
   <p class="byline">by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></p>
   <p class="subtitle">Upload your ChatGPT export and explore your conversations — what you talked about, when, and how your topics shifted over time.</p>
 
@@ -808,6 +808,7 @@
     To export: ChatGPT → Settings → Data Controls → Export Data.<br>
     You'll receive a <code>.zip</code> file — you can upload it directly, or extract it and upload the <code>conversations.json</code> file(s) inside.<br>
     <strong>Your data never leaves your browser.</strong>
+    Once uploaded, open <strong>Settings ⚙</strong> (top right) to save your data in the browser — so you don't need to re-upload next time.
   </p>
   <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.2 · 2026-03-31</p>
 </div>
@@ -843,7 +844,7 @@
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Save data in browser</div>
-            <div class="settings-row-sub">Saves now and on every future upload so you can reload instantly</div>
+            <div class="settings-row-sub">Your conversations will be available next time you open this page — no re-uploading needed</div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" id="autosave-toggle">
@@ -873,7 +874,7 @@
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Export topics</div>
-            <div class="settings-row-sub">Download the topic taxonomy as JSON</div>
+            <div class="settings-row-sub">Download the keyword categories used for topic detection — useful if you want to inspect or customize them</div>
           </div>
           <button class="settings-btn" id="export-topics-btn">Export</button>
         </div>
@@ -883,10 +884,8 @@
   </div>
 
   <div class="intro-block" style="padding-left:2rem;padding-right:2rem;max-width:1100px;margin:0 auto;">
-    <h2>Welcome to your ChatGPT Conversation Explorer</h2>
-    <p>Created by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></p>
-    <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Use the tabs above to explore.</p>
-    <p class="disclaimer"><em>Topics are estimated using keyword matching and may not always be accurate. Some conversations may land in the wrong category or fall into "Other." Use this as a rough guide, not a precise analysis.</em></p>
+    <h2>Welcome to ChatGPT Explorer</h2>
+    <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Pin conversations to mark them for download. Use the tabs below to explore.</p>
   </div>
 
   <div id="stats-bar">
@@ -921,7 +920,7 @@
   <div class="tab-panel active" id="tab-overview">
     <div class="card">
       <h2>Conversations per Month</h2>
-      <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration. <span style="color:var(--muted);font-size:.8em">Click any bar to browse that month's conversations.</span></p>
+      <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration. <span style="color:var(--muted)">Click any bar to browse that month's conversations.</span></p>
       <div class="chart-wrap"><canvas id="monthly-chart"></canvas></div>
     </div>
     <div class="card">
@@ -936,6 +935,7 @@
     <div class="intro-block">
       <h2>Browse by Topic</h2>
       <p>Your conversations have been automatically grouped into topics based on their titles. Click any topic card to see every conversation in that category — then click a conversation title to read the full exchange.</p>
+      <p class="disclaimer"><em>Topics are estimated using keyword matching and may not always be accurate. Some conversations may land in the wrong category or fall into "Other." Use this as a rough guide, not a precise analysis.</em></p>
     </div>
     <div class="card" id="topic-grid-card">
       <h2>All Topics</h2>
@@ -947,7 +947,7 @@
       <div id="convo-header">
         <h2 id="convo-list-title"></h2>
       </div>
-      <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> a conversation to mark it for download.</p>
+      <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread. Click the <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon to mark a conversation for download.</p>
       <div id="convo-list"></div>
     </div>
   </div>
@@ -956,7 +956,7 @@
   <div class="tab-panel" id="tab-search">
     <div class="intro-block">
       <h2>Search Your Conversations</h2>
-      <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> any result to mark it for download.</p>
+      <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember. Click the <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon on any result to mark it for download.</p>
     </div>
     <div id="search-filter-row">
       <input type="search" id="search-input" placeholder="Try a keyword, topic, or phrase…" autocomplete="off" />
@@ -972,7 +972,7 @@
   <div class="tab-panel" id="tab-downloads">
     <div class="intro-block">
       <h2>Marked for Download</h2>
-      <p>Conversations you've pinned <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
+      <p>Conversations you've marked with the <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
@@ -987,7 +987,7 @@
         </select>
       </div>
       <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
-      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
+      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click the pin icon on any conversation to mark it for download.</div>
       <div id="download-list"></div>
     </div>
   </div>
@@ -996,11 +996,11 @@
   <div class="tab-panel" id="tab-timeline">
     <div class="intro-block">
       <h2>Topic Activity Over Time</h2>
-      <p>See how your focus shifted month by month. Toggle topics on and off using the chips below the chart to compare specific themes. The emoji on each data point matches the topic — hover for the exact count.</p>
+      <p>See how your focus shifted month by month. Toggle topics on and off using the chips below the chart to compare specific themes. The emoji on each data point matches the topic — hover for the exact count, or click to see which conversations contributed to that data point.</p>
     </div>
     <div class="card">
       <h2>Monthly Breakdown by Topic</h2>
-      <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default. <span style="color:var(--muted);font-size:.8em">Click any data point to see those conversations.</span></p>
+      <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default.</p>
       <div id="timeline-controls"></div>
       <div class="chart-wrap" style="height:380px"><canvas id="timeline-chart"></canvas></div>
     </div>
@@ -2121,6 +2121,14 @@ function runSearch(query) {
   if (topicFilter) countParts.push(topicFilter);
   count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + (countParts.length ? ' for ' + countParts.join(' in ') : '');
 
+  if (!matches.length) {
+    const empty = document.createElement('p');
+    empty.style.cssText = 'color:var(--muted);font-size:.9rem;padding:.5rem 0';
+    empty.textContent = 'No results found.';
+    results.appendChild(empty);
+    return;
+  }
+
   for (const c of matches.slice(0, 50)) {
     const item = document.createElement('div');
     item.className = 'result-item';
@@ -2226,18 +2234,8 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
-  document.getElementById('drop-zone').innerHTML = `
-    <div class="icon">💬</div>
-    <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
-    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
-    <input type="file" id="file-input" accept=".zip,.json" multiple />
-  `;
-  document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
-  document.getElementById('file-input').addEventListener('change', () => {
-    const fi = document.getElementById('file-input');
-    if (fi.files.length) parseFiles(fi.files);
-  });
   document.getElementById('search-input').value = '';
+  checkForSavedData();
 });
 
 // ── Settings panel ────────────────────────────────────────────────────────────
@@ -2355,12 +2353,27 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
   document.getElementById('autosave-toggle').checked = false;
 });
 
-// ── Check for saved data on load ──────────────────────────────────────────────
+// ── Check for saved data ───────────────────────────────────────────────────────
 
-(async () => {
+function showDefaultDropZone() {
+  const dz = document.getElementById('drop-zone');
+  dz.innerHTML = `
+    <div class="icon">💬</div>
+    <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
+    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
+    <input type="file" id="file-input" accept=".zip,.json" multiple />
+  `;
+  document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
+  document.getElementById('file-input').addEventListener('change', () => {
+    const fi = document.getElementById('file-input');
+    if (fi.files.length) parseFiles(fi.files);
+  });
+}
+
+async function checkForSavedData() {
   try {
     const { conversations, savedAt } = await loadFromIndexedDB();
-    if (!conversations || conversations.length === 0) return;
+    if (!conversations || conversations.length === 0) { showDefaultDropZone(); return; }
 
     const dz = document.getElementById('drop-zone');
     const saved = new Date(savedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -2376,23 +2389,13 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
       allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
       buildDashboard();
     });
-    document.getElementById('upload-new-btn').addEventListener('click', () => {
-      dz.innerHTML = `
-        <div class="icon">💬</div>
-        <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
-        <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
-        <input type="file" id="file-input" accept=".zip,.json" multiple />
-      `;
-      document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
-      document.getElementById('file-input').addEventListener('change', () => {
-        const fi = document.getElementById('file-input');
-        if (fi.files.length) parseFiles(fi.files);
-      });
-    });
+    document.getElementById('upload-new-btn').addEventListener('click', showDefaultDropZone);
   } catch (e) {
-    // No saved data or IndexedDB unavailable — proceed normally
+    showDefaultDropZone();
   }
-})();
+}
+
+checkForSavedData();
 
 // ── Exports ───────────────────────────────────────────────────────────────────
 

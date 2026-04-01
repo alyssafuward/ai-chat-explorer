@@ -1,4 +1,4 @@
-# ChatGPT Conversation Explorer
+# ChatGPT Explorer
 
 **Created by [Alyssa Fu Ward](https://substack.com/@alyssafuward)**
 
