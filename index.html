@@ -599,6 +599,71 @@
       margin-top: .75rem;
     }
 
+    /* ── Merge dialog ─────────────────────────────── */
+
+    #merge-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 300;
+      backdrop-filter: blur(2px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #merge-overlay.open { display: flex; }
+
+    #merge-dialog {
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 2rem;
+      width: min(440px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    #merge-dialog h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 0; }
+    #merge-dialog p { font-size: .9rem; color: var(--muted); margin: 0; line-height: 1.5; }
+    .merge-actions { display: flex; flex-direction: column; gap: .65rem; }
+
+    #merge-add-btn {
+      padding: .65rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    #merge-add-btn:hover { background: #b05535; }
+
+    #merge-replace-btn {
+      padding: .65rem 1rem;
+      background: none;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: .92rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    #merge-replace-btn:hover { border-color: var(--muted); }
+
+    #merge-cancel-btn {
+      background: none;
+      border: none;
+      font-size: .82rem;
+      color: var(--muted);
+      cursor: pointer;
+      align-self: center;
+    }
+    #merge-cancel-btn:hover { color: var(--text); }
+
     /* ── Chart drill-down overlay ─────────────────── */
 
     #drilldown-overlay {
@@ -810,7 +875,7 @@
     <strong>Your data never leaves your browser.</strong>
     Once uploaded, open <strong>Settings ⚙</strong> (top right) to save your data in the browser — so you don't need to re-upload next time.
   </p>
-  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.2 · 2026-03-31</p>
+  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.3 · 2026-03-31</p>
 </div>
 
 <!-- ── Dashboard ──────────────────────────────────────────────────────────── -->
@@ -820,7 +885,7 @@
     <h1>ChatGPT Explorer</h1>
     <span id="header-range"></span>
     <div id="header-right">
-      <button id="reset-btn">← Load new files</button>
+      <button id="reset-btn">← Add / manage files</button>
       <button id="settings-btn" title="Settings">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1012,10 +1077,24 @@
 <footer>
   <span>Built by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></span>
   <span class="footer-divider">·</span>
-  <span>v2.2 · 2026-03-31</span>
+  <span>v2.3 · 2026-03-31</span>
 </footer>
 
 <!-- ── Conversation drawer ────────────────────────────────────────────────── -->
+
+<!-- ── Merge dialog ───────────────────────────────────────────────────────── -->
+
+<div id="merge-overlay">
+  <div id="merge-dialog">
+    <h3>You already have data loaded</h3>
+    <p id="merge-desc"></p>
+    <div class="merge-actions">
+      <button id="merge-add-btn">Add to existing data — merge &amp; deduplicate</button>
+      <button id="merge-replace-btn">Replace everything — start fresh</button>
+    </div>
+    <button id="merge-cancel-btn">Cancel</button>
+  </div>
+</div>
 
 <!-- ── Chart drill-down panel ─────────────────────────────────────────────── -->
 
@@ -1325,6 +1404,45 @@ function classifyConversation(conv) {
   return scoreTopics(vec, docText).topic;
 }
 
+// ── Merge helpers ─────────────────────────────────────────────────────────────
+
+function mergeConversations(existing, incoming, mode) {
+  if (mode === 'replace' || existing.length === 0) return incoming;
+  const existingKeys = new Set(existing.map(c => c._key));
+  const newOnly = incoming.filter(c => !existingKeys.has(c._key));
+  return [...existing, ...newOnly];
+}
+
+function maybeParseFiles(files) {
+  if (allConversations.length === 0) {
+    parseFiles(files, 'replace');
+    return;
+  }
+  // Data already loaded — ask what to do
+  document.getElementById('merge-desc').textContent =
+    `You have ${allConversations.length.toLocaleString()} conversations loaded. What would you like to do with the new files?`;
+  const overlay = document.getElementById('merge-overlay');
+  overlay.classList.add('open');
+
+  const addBtn     = document.getElementById('merge-add-btn');
+  const replaceBtn = document.getElementById('merge-replace-btn');
+  const cancelBtn  = document.getElementById('merge-cancel-btn');
+
+  function close() { overlay.classList.remove('open'); }
+
+  // Clone buttons to remove any prior listeners
+  const freshAdd     = addBtn.cloneNode(true);
+  const freshReplace = replaceBtn.cloneNode(true);
+  const freshCancel  = cancelBtn.cloneNode(true);
+  addBtn.replaceWith(freshAdd);
+  replaceBtn.replaceWith(freshReplace);
+  cancelBtn.replaceWith(freshCancel);
+
+  freshAdd.addEventListener('click', () => { close(); parseFiles(files, 'merge'); });
+  freshReplace.addEventListener('click', () => { close(); parseFiles(files, 'replace'); });
+  freshCancel.addEventListener('click', close);
+}
+
 // ── Parse conversations ──────────────────────────────────────────────────────
 
 let allConversations = [];
@@ -1332,7 +1450,7 @@ let monthlyChart, topicBarChart, timelineChart;
 let activeTimelineTopics = new Set();
 let topicColorMap = {};
 
-async function parseFiles(files) {
+async function parseFiles(files, mode = 'replace') {
   const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
   for (const file of files) {
     if (file.size > MAX_FILE_SIZE) {
@@ -1364,14 +1482,16 @@ async function parseFiles(files) {
 
     // Detect re-import of a previously exported file (has our format: date string + messages array, no create_time)
     if (raw.length > 0 && raw[0].date && raw[0].messages && !raw[0].create_time) {
-      allConversations = raw.map(c => ({
+      const reimported = raw.map(c => ({
         ...c,
+        _key: new Date(c.date).getTime() + '|' + (c.title || ''),
         date: new Date(c.date),
         monthKey: new Date(c.date).toISOString().slice(0, 7),
         monthLabel: new Date(c.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         userText: c.messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
         fullText: c.messages.map(m => m.text).join(' '),
-      })).sort((a, b) => a.date - b.date);
+      }));
+      allConversations = mergeConversations(allConversations, reimported, mode);
       buildDashboard();
       return;
     }
@@ -1405,17 +1525,22 @@ async function parseFiles(files) {
         const monthKey = date.toISOString().slice(0, 7);
         const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         const title = c.title || '(untitled)';
-        return { title, date, monthKey, monthLabel, messages,
+        return { _key: Math.round(c.create_time * 1000) + '|' + title,
+          title, date, monthKey, monthLabel, messages,
           userText: messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
           fullText: messages.map(m => m.text).join(' '),
         };
       });
 
-    // Pass 2: classify using title + message content
-    buildIDF(parsed);
-    allConversations = parsed
+    // Pass 2: merge/replace, then classify
+    const combined = mergeConversations(allConversations, parsed, mode);
+    buildIDF(combined);
+    const markedKeys = new Set([...markedForDownload].map(c => c._key));
+    markedForDownload.clear();
+    allConversations = combined
       .map(c => ({ ...c, topic: classifyConversation(c) }))
       .sort((a, b) => a.date - b.date);
+    allConversations.forEach(c => { if (markedKeys.has(c._key)) markedForDownload.add(c); });
 
     buildDashboard();
   } catch (err) {
@@ -2215,14 +2340,14 @@ const dropZone  = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 
 document.getElementById('browse-link').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', () => { if (fileInput.files.length) parseFiles(fileInput.files); });
+fileInput.addEventListener('change', () => { if (fileInput.files.length) maybeParseFiles(fileInput.files); });
 
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
 dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.classList.remove('drag-over');
-  if (e.dataTransfer.files.length) parseFiles(e.dataTransfer.files);
+  if (e.dataTransfer.files.length) maybeParseFiles(e.dataTransfer.files);
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
@@ -2366,7 +2491,7 @@ function showDefaultDropZone() {
   document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
   document.getElementById('file-input').addEventListener('change', () => {
     const fi = document.getElementById('file-input');
-    if (fi.files.length) parseFiles(fi.files);
+    if (fi.files.length) maybeParseFiles(fi.files);
   });
 }
 
