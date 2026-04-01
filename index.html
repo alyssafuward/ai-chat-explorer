@@ -2500,10 +2500,16 @@ function refreshSettingsUI() {
         const info = document.createElement('div');
         const label = document.createElement('div');
         label.className = 'batch-info';
-        label.textContent = b.files.join(', ');
+        const fileLabel = b.files.length === 1
+          ? b.files[0]
+          : b.files[0] + ' and ' + (b.files.length - 1) + ' more file' + (b.files.length > 2 ? 's' : '');
+        label.textContent = fileLabel;
         const meta = document.createElement('div');
         meta.className = 'batch-meta';
-        meta.textContent = new Date(b.timestamp).toLocaleString() + ' · ' + b.added.toLocaleString() + ' conversation' + (b.added !== 1 ? 's' : '') + ' added';
+        const addedLabel = b.added === 0
+          ? 'No new conversations — all duplicates'
+          : b.added.toLocaleString() + ' conversation' + (b.added !== 1 ? 's' : '') + ' added';
+        meta.textContent = new Date(b.timestamp).toLocaleString() + ' · ' + addedLabel;
         info.appendChild(label);
         info.appendChild(meta);
 
@@ -2601,7 +2607,6 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
 // ── Batch metadata ────────────────────────────────────────────────────────────
 
 async function saveBatchMeta(batchId, files, added) {
-  if (added <= 0) return;
   try {
     const db = await getDB();
     const tx = db.transaction('meta', 'readwrite');
