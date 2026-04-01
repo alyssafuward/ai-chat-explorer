@@ -10,10 +10,14 @@ A browser-based tool for exploring your ChatGPT conversation history. Upload you
 
 ## Features
 
-- **Overview** — monthly conversation volume and topic breakdown charts
+- **Overview** — monthly conversation volume (click any bar to browse that month) and topic breakdown charts
 - **Topics** — auto-classified conversations grouped into themes; click any topic to browse conversations, click any conversation to read the full thread
 - **Search** — full-text search across titles and message content with highlighted snippets
-- **Timeline** — line chart showing how your topics shifted month by month, with toggleable topic filters
+- **Timeline** — line chart showing how your topics shifted month by month; click any data point to see the conversations behind it
+- **ChatGPT Me** — extract your side of every conversation (your messages only) into a file you can hand to any AI to build a personal profile or mine your history
+- **Marked for Download** — pin conversations and download them individually or as a ZIP
+
+Your data is saved in the browser between sessions using IndexedDB. You can upload multiple exports and merge them — duplicates are automatically deduplicated.
 
 ---
 
@@ -36,6 +40,8 @@ Or visit the hosted version at: https://alyssafuward.github.io/chatgpt-explorer/
 Drag and drop your `.zip` export directly onto the upload area — no extraction needed. The app will find and process all `conversations.json` files inside automatically.
 
 You can also upload extracted JSON files individually: either a single `conversations.json` or multiple numbered files (`conversations-000.json`, `conversations-001.json`, etc.). Multiple files are supported.
+
+If you already have data saved in the browser, you'll be asked whether to merge the new files in or replace everything.
 
 ---
 
