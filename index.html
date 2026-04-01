@@ -2728,7 +2728,8 @@ document.getElementById('export-data-btn').addEventListener('click', () => {
 });
 
 document.getElementById('export-topics-btn').addEventListener('click', () => {
-  downloadJSON(TOPICS, 'chatgpt_explorer_topics.json');
+  const exportable = Object.entries(TOPICS).map(([topic, keywords]) => ({ topic, keywords }));
+  downloadJSON(exportable, 'chatgpt_explorer_topics.json');
 });
 
 function downloadJSON(data, filename) {
