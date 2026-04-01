@@ -1413,34 +1413,51 @@ function mergeConversations(existing, incoming, mode) {
   return [...existing, ...newOnly];
 }
 
+function showMergeDialog({ desc, onAdd, onReplace, onCancel }) {
+  document.getElementById('merge-desc').textContent = desc;
+  const overlay = document.getElementById('merge-overlay');
+  overlay.classList.add('open');
+
+  function close() { overlay.classList.remove('open'); }
+
+  // Clone buttons to remove any prior listeners
+  const freshAdd     = document.getElementById('merge-add-btn').cloneNode(true);
+  const freshReplace = document.getElementById('merge-replace-btn').cloneNode(true);
+  const freshCancel  = document.getElementById('merge-cancel-btn').cloneNode(true);
+  document.getElementById('merge-add-btn').replaceWith(freshAdd);
+  document.getElementById('merge-replace-btn').replaceWith(freshReplace);
+  document.getElementById('merge-cancel-btn').replaceWith(freshCancel);
+
+  freshAdd.addEventListener('click',     () => { close(); onAdd(); });
+  freshReplace.addEventListener('click', () => { close(); onReplace(); });
+  freshCancel.addEventListener('click',  () => { close(); if (onCancel) onCancel(); });
+}
+
 function maybeParseFiles(files) {
   if (allConversations.length === 0) {
     parseFiles(files, 'replace');
     return;
   }
-  // Data already loaded — ask what to do
-  document.getElementById('merge-desc').textContent =
-    `You have ${allConversations.length.toLocaleString()} conversations loaded. What would you like to do with the new files?`;
-  const overlay = document.getElementById('merge-overlay');
-  overlay.classList.add('open');
+  showMergeDialog({
+    desc: `You have ${allConversations.length.toLocaleString()} conversations loaded. What would you like to do with the new files?`,
+    onAdd:     () => parseFiles(files, 'merge'),
+    onReplace: () => parseFiles(files, 'replace'),
+  });
+}
 
-  const addBtn     = document.getElementById('merge-add-btn');
-  const replaceBtn = document.getElementById('merge-replace-btn');
-  const cancelBtn  = document.getElementById('merge-cancel-btn');
-
-  function close() { overlay.classList.remove('open'); }
-
-  // Clone buttons to remove any prior listeners
-  const freshAdd     = addBtn.cloneNode(true);
-  const freshReplace = replaceBtn.cloneNode(true);
-  const freshCancel  = cancelBtn.cloneNode(true);
-  addBtn.replaceWith(freshAdd);
-  replaceBtn.replaceWith(freshReplace);
-  cancelBtn.replaceWith(freshCancel);
-
-  freshAdd.addEventListener('click', () => { close(); parseFiles(files, 'merge'); });
-  freshReplace.addEventListener('click', () => { close(); parseFiles(files, 'replace'); });
-  freshCancel.addEventListener('click', close);
+function openFilePicker(mode, preloadConversations) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.zip,.json';
+  input.multiple = true;
+  input.addEventListener('change', () => {
+    if (!input.files.length) return;
+    if (preloadConversations) {
+      allConversations = preloadConversations.map(c => ({ ...c, date: new Date(c.date) }));
+    }
+    parseFiles(input.files, mode);
+  });
+  input.click();
 }
 
 // ── Parse conversations ──────────────────────────────────────────────────────
@@ -2514,7 +2531,14 @@ async function checkForSavedData() {
       allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
       buildDashboard();
     });
-    document.getElementById('upload-new-btn').addEventListener('click', showDefaultDropZone);
+    document.getElementById('upload-new-btn').addEventListener('click', () => {
+      showMergeDialog({
+        desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
+        onAdd:     () => openFilePicker('merge', conversations),
+        onReplace: () => openFilePicker('replace', null),
+        onCancel:  () => {},  // stay on saved-data screen
+      });
+    });
   } catch (e) {
     showDefaultDropZone();
   }
