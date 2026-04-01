@@ -1406,10 +1406,14 @@ function classifyConversation(conv) {
 
 // ── Merge helpers ─────────────────────────────────────────────────────────────
 
+function deriveKey(c) {
+  return c._key || (c.date.getTime() + '|' + (c.title || ''));
+}
+
 function mergeConversations(existing, incoming, mode) {
   if (mode === 'replace' || existing.length === 0) return incoming;
-  const existingKeys = new Set(existing.map(c => c._key));
-  const newOnly = incoming.filter(c => !existingKeys.has(c._key));
+  const existingKeys = new Set(existing.map(deriveKey));
+  const newOnly = incoming.filter(c => !existingKeys.has(deriveKey(c)));
   return [...existing, ...newOnly];
 }
 
