@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatGPT Conversation Explorer</title>
+  <title>ChatGPT Explorer</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
           integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g"
           crossorigin="anonymous"></script>
@@ -793,7 +793,7 @@
 <!-- ── Upload screen ──────────────────────────────────────────────────────── -->
 
 <div id="upload-screen">
-  <h1>ChatGPT Conversation Explorer</h1>
+  <h1>ChatGPT Explorer</h1>
   <p class="byline">by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></p>
   <p class="subtitle">Upload your ChatGPT export and explore your conversations — what you talked about, when, and how your topics shifted over time.</p>
 
@@ -884,9 +884,8 @@
   </div>
 
   <div class="intro-block" style="padding-left:2rem;padding-right:2rem;max-width:1100px;margin:0 auto;">
-    <h2>Welcome to your ChatGPT Conversation Explorer</h2>
-    <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Use the tabs above to explore.</p>
-    <p class="disclaimer"><em>Topics are estimated using keyword matching and may not always be accurate. Some conversations may land in the wrong category or fall into "Other." Use this as a rough guide, not a precise analysis.</em></p>
+    <h2>Welcome to ChatGPT Explorer</h2>
+    <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Pin conversations to mark them for download. Use the tabs below to explore.</p>
   </div>
 
   <div id="stats-bar">
@@ -921,7 +920,7 @@
   <div class="tab-panel active" id="tab-overview">
     <div class="card">
       <h2>Conversations per Month</h2>
-      <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration. <span style="color:var(--muted);font-size:.8em">Click any bar to browse that month's conversations.</span></p>
+      <p class="card-desc">How many conversations you started each month. Peaks often reflect periods of focused work or exploration. <span style="color:var(--muted)">Click any bar to browse that month's conversations.</span></p>
       <div class="chart-wrap"><canvas id="monthly-chart"></canvas></div>
     </div>
     <div class="card">
@@ -936,6 +935,7 @@
     <div class="intro-block">
       <h2>Browse by Topic</h2>
       <p>Your conversations have been automatically grouped into topics based on their titles. Click any topic card to see every conversation in that category — then click a conversation title to read the full exchange.</p>
+      <p class="disclaimer"><em>Topics are estimated using keyword matching and may not always be accurate. Some conversations may land in the wrong category or fall into "Other." Use this as a rough guide, not a precise analysis.</em></p>
     </div>
     <div class="card" id="topic-grid-card">
       <h2>All Topics</h2>
@@ -996,11 +996,11 @@
   <div class="tab-panel" id="tab-timeline">
     <div class="intro-block">
       <h2>Topic Activity Over Time</h2>
-      <p>See how your focus shifted month by month. Toggle topics on and off using the chips below the chart to compare specific themes. The emoji on each data point matches the topic — hover for the exact count.</p>
+      <p>See how your focus shifted month by month. Toggle topics on and off using the chips below the chart to compare specific themes. The emoji on each data point matches the topic — hover for the exact count, or click to see which conversations contributed to that data point.</p>
     </div>
     <div class="card">
       <h2>Monthly Breakdown by Topic</h2>
-      <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default. <span style="color:var(--muted);font-size:.8em">Click any data point to see those conversations.</span></p>
+      <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default.</p>
       <div id="timeline-controls"></div>
       <div class="chart-wrap" style="height:380px"><canvas id="timeline-chart"></canvas></div>
     </div>
@@ -2234,18 +2234,8 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
-  document.getElementById('drop-zone').innerHTML = `
-    <div class="icon">💬</div>
-    <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
-    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
-    <input type="file" id="file-input" accept=".zip,.json" multiple />
-  `;
-  document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
-  document.getElementById('file-input').addEventListener('change', () => {
-    const fi = document.getElementById('file-input');
-    if (fi.files.length) parseFiles(fi.files);
-  });
   document.getElementById('search-input').value = '';
+  checkForSavedData();
 });
 
 // ── Settings panel ────────────────────────────────────────────────────────────
@@ -2363,12 +2353,27 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
   document.getElementById('autosave-toggle').checked = false;
 });
 
-// ── Check for saved data on load ──────────────────────────────────────────────
+// ── Check for saved data ───────────────────────────────────────────────────────
 
-(async () => {
+function showDefaultDropZone() {
+  const dz = document.getElementById('drop-zone');
+  dz.innerHTML = `
+    <div class="icon">💬</div>
+    <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
+    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
+    <input type="file" id="file-input" accept=".zip,.json" multiple />
+  `;
+  document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
+  document.getElementById('file-input').addEventListener('change', () => {
+    const fi = document.getElementById('file-input');
+    if (fi.files.length) parseFiles(fi.files);
+  });
+}
+
+async function checkForSavedData() {
   try {
     const { conversations, savedAt } = await loadFromIndexedDB();
-    if (!conversations || conversations.length === 0) return;
+    if (!conversations || conversations.length === 0) { showDefaultDropZone(); return; }
 
     const dz = document.getElementById('drop-zone');
     const saved = new Date(savedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -2384,23 +2389,13 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
       allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
       buildDashboard();
     });
-    document.getElementById('upload-new-btn').addEventListener('click', () => {
-      dz.innerHTML = `
-        <div class="icon">💬</div>
-        <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
-        <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
-        <input type="file" id="file-input" accept=".zip,.json" multiple />
-      `;
-      document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
-      document.getElementById('file-input').addEventListener('change', () => {
-        const fi = document.getElementById('file-input');
-        if (fi.files.length) parseFiles(fi.files);
-      });
-    });
+    document.getElementById('upload-new-btn').addEventListener('click', showDefaultDropZone);
   } catch (e) {
-    // No saved data or IndexedDB unavailable — proceed normally
+    showDefaultDropZone();
   }
-})();
+}
+
+checkForSavedData();
 
 // ── Exports ───────────────────────────────────────────────────────────────────
 
