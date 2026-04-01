@@ -127,6 +127,13 @@
 
     #header-right { display: flex; align-items: center; gap: .6rem; }
 
+    #save-status-pill {
+      font-size: .72rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    #save-status-pill.saved { color: #5a9a5a; }
+
     #reset-btn {
       font-size: .8rem;
       color: var(--muted);
@@ -212,6 +219,18 @@
     }
     .settings-row-label { font-size: .88rem; color: var(--text); }
     .settings-row-sub { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
+
+    .batch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: .75rem;
+    }
+    .batch-row:last-child { border-bottom: none; }
+    .batch-info { font-size: .82rem; color: var(--text); }
+    .batch-meta { font-size: .75rem; color: var(--muted); margin-top: .1rem; }
 
     .settings-btn {
       font-size: .8rem;
@@ -599,6 +618,71 @@
       margin-top: .75rem;
     }
 
+    /* ── Merge dialog ─────────────────────────────── */
+
+    #merge-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 300;
+      backdrop-filter: blur(2px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #merge-overlay.open { display: flex; }
+
+    #merge-dialog {
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 2rem;
+      width: min(440px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    #merge-dialog h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 0; }
+    #merge-dialog p { font-size: .9rem; color: var(--muted); margin: 0; line-height: 1.5; }
+    .merge-actions { display: flex; flex-direction: column; gap: .65rem; }
+
+    #merge-add-btn {
+      padding: .65rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    #merge-add-btn:hover { background: #b05535; }
+
+    #merge-replace-btn {
+      padding: .65rem 1rem;
+      background: none;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: .92rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    #merge-replace-btn:hover { border-color: var(--muted); }
+
+    #merge-cancel-btn {
+      background: none;
+      border: none;
+      font-size: .82rem;
+      color: var(--muted);
+      cursor: pointer;
+      align-self: center;
+    }
+    #merge-cancel-btn:hover { color: var(--text); }
+
     /* ── Chart drill-down overlay ─────────────────── */
 
     #drilldown-overlay {
@@ -810,7 +894,7 @@
     <strong>Your data never leaves your browser.</strong>
     Once uploaded, open <strong>Settings ⚙</strong> (top right) to save your data in the browser — so you don't need to re-upload next time.
   </p>
-  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.2 · 2026-03-31</p>
+  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.4 · 2026-03-31</p>
 </div>
 
 <!-- ── Dashboard ──────────────────────────────────────────────────────────── -->
@@ -820,7 +904,8 @@
     <h1>ChatGPT Explorer</h1>
     <span id="header-range"></span>
     <div id="header-right">
-      <button id="reset-btn">← Load new files</button>
+      <span id="save-status-pill"></span>
+      <button id="reset-btn">← Add / manage files</button>
       <button id="settings-btn" title="Settings">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -859,6 +944,12 @@
           <button class="settings-btn danger" id="clear-data-btn" disabled>Clear</button>
         </div>
         <div class="settings-row-sub" style="margin-top:-.4rem">Data is stored locally in this browser only and is never transmitted anywhere.</div>
+      </div>
+
+      <!-- Upload History -->
+      <div class="settings-section">
+        <h3>Upload History</h3>
+        <div id="upload-history-list"><span style="font-size:.85rem;color:var(--muted)">No upload history.</span></div>
       </div>
 
       <!-- Export -->
@@ -1012,10 +1103,24 @@
 <footer>
   <span>Built by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></span>
   <span class="footer-divider">·</span>
-  <span>v2.2 · 2026-03-31</span>
+  <span>v2.4 · 2026-03-31</span>
 </footer>
 
 <!-- ── Conversation drawer ────────────────────────────────────────────────── -->
+
+<!-- ── Merge dialog ───────────────────────────────────────────────────────── -->
+
+<div id="merge-overlay">
+  <div id="merge-dialog">
+    <h3>You already have data loaded</h3>
+    <p id="merge-desc"></p>
+    <div class="merge-actions">
+      <button id="merge-add-btn">Add to existing data — merge &amp; deduplicate</button>
+      <button id="merge-replace-btn">Replace everything — start fresh</button>
+    </div>
+    <button id="merge-cancel-btn">Cancel</button>
+  </div>
+</div>
 
 <!-- ── Chart drill-down panel ─────────────────────────────────────────────── -->
 
@@ -1325,6 +1430,66 @@ function classifyConversation(conv) {
   return scoreTopics(vec, docText).topic;
 }
 
+// ── Merge helpers ─────────────────────────────────────────────────────────────
+
+function deriveKey(c) {
+  return c._key || (c.date.getTime() + '|' + (c.title || ''));
+}
+
+function mergeConversations(existing, incoming, mode) {
+  if (mode === 'replace' || existing.length === 0) return incoming;
+  const existingKeys = new Set(existing.map(deriveKey));
+  const newOnly = incoming.filter(c => !existingKeys.has(deriveKey(c)));
+  return [...existing, ...newOnly];
+}
+
+function showMergeDialog({ desc, onAdd, onReplace, onCancel }) {
+  document.getElementById('merge-desc').textContent = desc;
+  const overlay = document.getElementById('merge-overlay');
+  overlay.classList.add('open');
+
+  function close() { overlay.classList.remove('open'); }
+
+  // Clone buttons to remove any prior listeners
+  const freshAdd     = document.getElementById('merge-add-btn').cloneNode(true);
+  const freshReplace = document.getElementById('merge-replace-btn').cloneNode(true);
+  const freshCancel  = document.getElementById('merge-cancel-btn').cloneNode(true);
+  document.getElementById('merge-add-btn').replaceWith(freshAdd);
+  document.getElementById('merge-replace-btn').replaceWith(freshReplace);
+  document.getElementById('merge-cancel-btn').replaceWith(freshCancel);
+
+  freshAdd.addEventListener('click',     () => { close(); onAdd(); });
+  freshReplace.addEventListener('click', () => { close(); onReplace(); });
+  freshCancel.addEventListener('click',  () => { close(); if (onCancel) onCancel(); });
+}
+
+function maybeParseFiles(files) {
+  if (allConversations.length === 0) {
+    parseFiles(files, 'replace');
+    return;
+  }
+  showMergeDialog({
+    desc: `You have ${allConversations.length.toLocaleString()} conversations loaded. What would you like to do with the new files?`,
+    onAdd:     () => parseFiles(files, 'merge'),
+    onReplace: () => parseFiles(files, 'replace'),
+  });
+}
+
+function openFilePicker(mode, preloadConversations) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.zip,.json';
+  input.multiple = true;
+  input.addEventListener('change', () => {
+    if (!input.files.length) return;
+    if (preloadConversations) {
+      allConversations = preloadConversations.map(c => ({ ...c, date: new Date(c.date) }));
+    }
+    parseFiles(input.files, mode);
+  });
+  input.click();
+}
+
 // ── Parse conversations ──────────────────────────────────────────────────────
 
 let allConversations = [];
@@ -1332,7 +1497,9 @@ let monthlyChart, topicBarChart, timelineChart;
 let activeTimelineTopics = new Set();
 let topicColorMap = {};
 
-async function parseFiles(files) {
+async function parseFiles(files, mode = 'replace') {
+  const batchId   = Date.now();
+  const batchFiles = Array.from(files).map(f => f.name);
   const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
   for (const file of files) {
     if (file.size > MAX_FILE_SIZE) {
@@ -1364,14 +1531,23 @@ async function parseFiles(files) {
 
     // Detect re-import of a previously exported file (has our format: date string + messages array, no create_time)
     if (raw.length > 0 && raw[0].date && raw[0].messages && !raw[0].create_time) {
-      allConversations = raw.map(c => ({
-        ...c,
-        date: new Date(c.date),
-        monthKey: new Date(c.date).toISOString().slice(0, 7),
-        monthLabel: new Date(c.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        userText: c.messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
-        fullText: c.messages.map(m => m.text).join(' '),
-      })).sort((a, b) => a.date - b.date);
+      const reimported = raw.map(c => {
+        const date = new Date(c.date);
+        return {
+          ...c,
+          _key:     c._key || (date.getTime() + '|' + (c.title || '')),
+          _batchId: c._batchId || batchId,
+          date,
+          monthKey:  date.toISOString().slice(0, 7),
+          monthLabel: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          userText: c.messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
+          fullText: c.messages.map(m => m.text).join(' '),
+        };
+      });
+      const before = allConversations.length;
+      allConversations = mergeConversations(allConversations, reimported, mode);
+      const added = allConversations.length - (mode === 'replace' ? 0 : before);
+      await saveBatchMeta(batchId, batchFiles, added);
       buildDashboard();
       return;
     }
@@ -1405,18 +1581,26 @@ async function parseFiles(files) {
         const monthKey = date.toISOString().slice(0, 7);
         const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         const title = c.title || '(untitled)';
-        return { title, date, monthKey, monthLabel, messages,
+        return { _key: date.getTime() + '|' + title, _batchId: batchId,
+          title, date, monthKey, monthLabel, messages,
           userText: messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
           fullText: messages.map(m => m.text).join(' '),
         };
       });
 
-    // Pass 2: classify using title + message content
-    buildIDF(parsed);
-    allConversations = parsed
+    // Pass 2: merge/replace, then classify
+    const before = allConversations.length;
+    const combined = mergeConversations(allConversations, parsed, mode);
+    buildIDF(combined);
+    const markedKeys = new Set([...markedForDownload].map(c => c._key));
+    markedForDownload.clear();
+    allConversations = combined
       .map(c => ({ ...c, topic: classifyConversation(c) }))
       .sort((a, b) => a.date - b.date);
+    allConversations.forEach(c => { if (markedKeys.has(c._key)) markedForDownload.add(c); });
 
+    const added = allConversations.length - (mode === 'replace' ? 0 : before);
+    await saveBatchMeta(batchId, batchFiles, added);
     buildDashboard();
   } catch (err) {
     alert('Error reading files: ' + err.message);
@@ -1433,6 +1617,7 @@ function buildDashboard() {
   if (document.getElementById('autosave-toggle').checked) {
     saveToIndexedDB();
   }
+  refreshSaveStatusPill();
 
   // Populate search topic filter
   const topicFilter = document.getElementById('search-topic-filter');
@@ -2215,14 +2400,14 @@ const dropZone  = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 
 document.getElementById('browse-link').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', () => { if (fileInput.files.length) parseFiles(fileInput.files); });
+fileInput.addEventListener('change', () => { if (fileInput.files.length) maybeParseFiles(fileInput.files); });
 
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
 dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.classList.remove('drag-over');
-  if (e.dataTransfer.files.length) parseFiles(e.dataTransfer.files);
+  if (e.dataTransfer.files.length) maybeParseFiles(e.dataTransfer.files);
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
@@ -2253,16 +2438,37 @@ function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
 }
 
+function refreshSaveStatusPill() {
+  const pill = document.getElementById('save-status-pill');
+  if (!pill) return;
+  getDB().then(db => {
+    const tx = db.transaction('meta', 'readonly');
+    const req = tx.objectStore('meta').get('savedAt');
+    req.onsuccess = () => {
+      if (req.result) {
+        pill.textContent = '✓ Saved in browser';
+        pill.className = 'saved';
+      } else {
+        pill.textContent = 'Not saved — closes with tab';
+        pill.className = '';
+      }
+    };
+  }).catch(() => { pill.textContent = ''; });
+}
+
 function refreshSettingsUI() {
+  refreshSaveStatusPill();
   const hasCurrent = allConversations.length > 0;
   document.getElementById('export-data-btn').disabled = !hasCurrent;
 
   getDB().then(db => {
     const tx = db.transaction('meta', 'readonly');
-    const req = tx.objectStore('meta').get('savedAt');
-    req.onsuccess = () => {
-      const savedAt = req.result;
-      const status = document.getElementById('settings-save-status');
+    const savedReq  = tx.objectStore('meta').get('savedAt');
+    const batchReq  = tx.objectStore('meta').get('batches');
+
+    savedReq.onsuccess = () => {
+      const savedAt  = savedReq.result;
+      const status   = document.getElementById('settings-save-status');
       const clearBtn = document.getElementById('clear-data-btn');
       if (savedAt) {
         const sizeMB = hasCurrent ? (JSON.stringify(allConversations).length / 1024 / 1024).toFixed(1) : '?';
@@ -2276,6 +2482,50 @@ function refreshSettingsUI() {
           : 'No data saved in this browser.';
         clearBtn.disabled = true;
       }
+    };
+
+    batchReq.onsuccess = () => {
+      const batches = batchReq.result || [];
+      const container = document.getElementById('upload-history-list');
+      if (!batches.length) {
+        container.innerHTML = '<span style="font-size:.85rem;color:var(--muted)">No upload history.</span>';
+        return;
+      }
+      container.innerHTML = '';
+      // Show most recent first
+      [...batches].reverse().forEach(b => {
+        const row = document.createElement('div');
+        row.className = 'batch-row';
+
+        const info = document.createElement('div');
+        const label = document.createElement('div');
+        label.className = 'batch-info';
+        const fileLabel = b.files.length === 1
+          ? b.files[0]
+          : b.files[0] + ' and ' + (b.files.length - 1) + ' more file' + (b.files.length > 2 ? 's' : '');
+        label.textContent = fileLabel;
+        const meta = document.createElement('div');
+        meta.className = 'batch-meta';
+        const addedLabel = b.added === 0
+          ? 'No new conversations — all duplicates'
+          : b.added.toLocaleString() + ' conversation' + (b.added !== 1 ? 's' : '') + ' added';
+        meta.textContent = new Date(b.timestamp).toLocaleString() + ' · ' + addedLabel;
+        info.appendChild(label);
+        info.appendChild(meta);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'settings-btn danger';
+        removeBtn.style.cssText = 'font-size:.75rem;padding:.2rem .55rem;flex-shrink:0';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', async () => {
+          if (!confirm(`Remove all conversations from this upload (${b.files.join(', ')})?`)) return;
+          await removeBatch(b.id);
+        });
+
+        row.appendChild(info);
+        row.appendChild(removeBtn);
+        container.appendChild(row);
+      });
     };
   });
 }
@@ -2333,6 +2583,7 @@ async function clearIndexedDB() {
   const tx = db.transaction(['conversations', 'meta'], 'readwrite');
   tx.objectStore('conversations').clear();
   tx.objectStore('meta').delete('savedAt');
+  tx.objectStore('meta').delete('batches');
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => { resolve(); refreshSettingsUI(); };
     tx.onerror = e => reject(e.target.error);
@@ -2353,6 +2604,64 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
   document.getElementById('autosave-toggle').checked = false;
 });
 
+// ── Batch metadata ────────────────────────────────────────────────────────────
+
+async function saveBatchMeta(batchId, files, added) {
+  try {
+    const db = await getDB();
+    const tx = db.transaction('meta', 'readwrite');
+    const store = tx.objectStore('meta');
+    const req = store.get('batches');
+    req.onsuccess = () => {
+      const batches = req.result || [];
+      batches.push({ id: batchId, timestamp: batchId, files, added });
+      store.put(batches, 'batches');
+    };
+  } catch (e) { /* non-critical */ }
+}
+
+async function loadBatchMeta() {
+  try {
+    const db = await getDB();
+    return new Promise(resolve => {
+      const tx = db.transaction('meta', 'readonly');
+      const req = tx.objectStore('meta').get('batches');
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch (e) { return []; }
+}
+
+async function removeBatch(batchId) {
+  const markedKeys = new Set([...markedForDownload].map(c => c._key));
+  allConversations = allConversations.filter(c => c._batchId !== batchId);
+  markedForDownload.clear();
+  allConversations.forEach(c => { if (markedKeys.has(c._key)) markedForDownload.add(c); });
+
+  // Remove from batch meta
+  try {
+    const db = await getDB();
+    const tx = db.transaction('meta', 'readwrite');
+    const store = tx.objectStore('meta');
+    const req = store.get('batches');
+    req.onsuccess = () => {
+      const batches = (req.result || []).filter(b => b.id !== batchId);
+      store.put(batches, 'batches');
+    };
+  } catch (e) { /* non-critical */ }
+
+  if (allConversations.length === 0) {
+    await clearIndexedDB();
+    checkForSavedData();
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('upload-screen').style.display = 'flex';
+    return;
+  }
+  if (document.getElementById('autosave-toggle').checked) saveToIndexedDB();
+  buildDashboard();
+  refreshSettingsUI();
+}
+
 // ── Check for saved data ───────────────────────────────────────────────────────
 
 function showDefaultDropZone() {
@@ -2366,7 +2675,7 @@ function showDefaultDropZone() {
   document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
   document.getElementById('file-input').addEventListener('change', () => {
     const fi = document.getElementById('file-input');
-    if (fi.files.length) parseFiles(fi.files);
+    if (fi.files.length) maybeParseFiles(fi.files);
   });
 }
 
@@ -2389,7 +2698,14 @@ async function checkForSavedData() {
       allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
       buildDashboard();
     });
-    document.getElementById('upload-new-btn').addEventListener('click', showDefaultDropZone);
+    document.getElementById('upload-new-btn').addEventListener('click', () => {
+      showMergeDialog({
+        desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
+        onAdd:     () => openFilePicker('merge', conversations),
+        onReplace: () => openFilePicker('replace', null),
+        onCancel:  () => {},  // stay on saved-data screen
+      });
+    });
   } catch (e) {
     showDefaultDropZone();
   }
@@ -2401,6 +2717,8 @@ checkForSavedData();
 
 document.getElementById('export-data-btn').addEventListener('click', () => {
   const exportable = allConversations.map(c => ({
+    _key:     c._key,
+    _batchId: c._batchId,
     title: c.title,
     date: c.date.toISOString(),
     topic: c.topic,
@@ -2410,7 +2728,8 @@ document.getElementById('export-data-btn').addEventListener('click', () => {
 });
 
 document.getElementById('export-topics-btn').addEventListener('click', () => {
-  downloadJSON(TOPICS, 'chatgpt_explorer_topics.json');
+  const exportable = Object.entries(TOPICS).map(([topic, keywords]) => ({ topic, keywords }));
+  downloadJSON(exportable, 'chatgpt_explorer_topics.json');
 });
 
 function downloadJSON(data, filename) {
