@@ -808,6 +808,7 @@
     To export: ChatGPT → Settings → Data Controls → Export Data.<br>
     You'll receive a <code>.zip</code> file — you can upload it directly, or extract it and upload the <code>conversations.json</code> file(s) inside.<br>
     <strong>Your data never leaves your browser.</strong>
+    Once uploaded, open <strong>Settings ⚙</strong> (top right) to save your data in the browser — so you don't need to re-upload next time.
   </p>
   <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.2 · 2026-03-31</p>
 </div>
@@ -843,7 +844,7 @@
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Save data in browser</div>
-            <div class="settings-row-sub">Saves now and on every future upload so you can reload instantly</div>
+            <div class="settings-row-sub">Your conversations will be available next time you open this page — no re-uploading needed</div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" id="autosave-toggle">
@@ -873,7 +874,7 @@
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Export topics</div>
-            <div class="settings-row-sub">Download the topic taxonomy as JSON</div>
+            <div class="settings-row-sub">Download the keyword categories used for topic detection — useful if you want to inspect or customize them</div>
           </div>
           <button class="settings-btn" id="export-topics-btn">Export</button>
         </div>
@@ -884,7 +885,6 @@
 
   <div class="intro-block" style="padding-left:2rem;padding-right:2rem;max-width:1100px;margin:0 auto;">
     <h2>Welcome to your ChatGPT Conversation Explorer</h2>
-    <p>Created by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></p>
     <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Use the tabs above to explore.</p>
     <p class="disclaimer"><em>Topics are estimated using keyword matching and may not always be accurate. Some conversations may land in the wrong category or fall into "Other." Use this as a rough guide, not a precise analysis.</em></p>
   </div>
@@ -947,7 +947,7 @@
       <div id="convo-header">
         <h2 id="convo-list-title"></h2>
       </div>
-      <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> a conversation to mark it for download.</p>
+      <p class="card-desc" style="margin-bottom:.75rem">Sorted most recent first. Click any conversation to read the full thread. Click the <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon to mark a conversation for download.</p>
       <div id="convo-list"></div>
     </div>
   </div>
@@ -956,7 +956,7 @@
   <div class="tab-panel" id="tab-search">
     <div class="intro-block">
       <h2>Search Your Conversations</h2>
-      <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember. Pin <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> any result to mark it for download.</p>
+      <p>Search across every conversation title and message — all processing happens in your browser, so nothing is sent anywhere. Type a keyword, a person's name, a project, a question you asked — anything you remember. Click the <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon on any result to mark it for download.</p>
     </div>
     <div id="search-filter-row">
       <input type="search" id="search-input" placeholder="Try a keyword, topic, or phrase…" autocomplete="off" />
@@ -972,7 +972,7 @@
   <div class="tab-panel" id="tab-downloads">
     <div class="intro-block">
       <h2>Marked for Download</h2>
-      <p>Conversations you've pinned <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
+      <p>Conversations you've marked with the <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
@@ -987,7 +987,7 @@
         </select>
       </div>
       <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
-      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click ★ on any conversation to mark it.</div>
+      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click the pin icon on any conversation to mark it for download.</div>
       <div id="download-list"></div>
     </div>
   </div>
@@ -2120,6 +2120,14 @@ function runSearch(query) {
   if (query) countParts.push(`"${query}"`);
   if (topicFilter) countParts.push(topicFilter);
   count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + (countParts.length ? ' for ' + countParts.join(' in ') : '');
+
+  if (!matches.length) {
+    const empty = document.createElement('p');
+    empty.style.cssText = 'color:var(--muted);font-size:.9rem;padding:.5rem 0';
+    empty.textContent = 'No results found.';
+    results.appendChild(empty);
+    return;
+  }
 
   for (const c of matches.slice(0, 50)) {
     const item = document.createElement('div');
