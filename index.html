@@ -352,6 +352,19 @@
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
+    .tab-btn-pill {
+      align-self: center;
+      border-bottom: none !important;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: .4rem 1rem;
+      font-size: .83rem;
+      margin-bottom: 6px;
+    }
+
+    .tab-btn-pill:hover { background: #f0ece8; color: var(--text); }
+    .tab-btn-pill.active { background: #fceee8; border-color: var(--accent); color: var(--accent); }
+
     .tab-panel { display: none; padding: 1.5rem 2rem 3rem; max-width: 1100px; margin: 0 auto; }
     .tab-panel.active { display: block; }
 
@@ -568,6 +581,169 @@
     }
 
     .tl-chip.active { border-color: var(--accent); color: var(--accent); background: #FEF4EE; font-weight: 600; }
+
+    /* ── Claude Profile tab ────────────────────────── */
+
+    #profile-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-seg-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .profile-seg-label { font-size: .85rem; color: var(--muted); white-space: nowrap; }
+
+    .profile-seg {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .profile-seg-btn {
+      background: var(--surface);
+      color: var(--muted);
+      border: none;
+      border-right: 1px solid var(--border);
+      padding: 6px 14px;
+      font-size: .83rem;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .profile-seg-btn:last-child { border-right: none; }
+    .profile-seg-btn:hover { background: #f0ece8; color: var(--text); }
+    .profile-seg-btn.active { background: var(--accent); color: #fff; }
+
+    .profile-cap-custom {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: .83rem;
+      color: var(--muted);
+    }
+
+    .profile-cap-custom.visible { display: flex; }
+
+    .profile-cap-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 5px 10px;
+      font-size: .83rem;
+      width: 68px;
+      text-align: right;
+    }
+
+    .profile-cap-input:focus { outline: none; border-color: var(--accent); }
+
+    .profile-cap-status {
+      font-size: .82rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .profile-cap-status.complete {
+      display: block;
+      background: #eef5ec;
+      color: #3a7a3a;
+      border: 1px solid #b8d8b8;
+    }
+
+    .profile-cap-status.capped {
+      display: block;
+      background: #fdf6e3;
+      color: #8a6a10;
+      border: 1px solid #e8d898;
+    }
+
+    .profile-section-label {
+      font-weight: 600;
+      font-size: .9rem;
+      margin-bottom: .35rem;
+    }
+
+    .profile-section-sub {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: .75rem;
+    }
+
+    .profile-prompt-textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      font-size: .88rem;
+      line-height: 1.7;
+      color: var(--text);
+      width: 100%;
+      min-height: 260px;
+      resize: vertical;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .profile-prompt-textarea:focus { outline: none; border-color: var(--accent); }
+
+    .profile-cover-box {
+      background: #f0f5ee;
+      border: 1px solid #c8dcc0;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      font-size: .88rem;
+      line-height: 1.7;
+      color: #3a6035;
+      white-space: pre-wrap;
+      font-style: italic;
+    }
+
+    .profile-btn-row { display: flex; gap: 8px; margin-top: .75rem; flex-wrap: wrap; }
+
+    .profile-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: .55rem 1.2rem;
+      font-size: .88rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity .15s, background .15s;
+      border: none;
+    }
+
+    .profile-btn-primary { background: var(--accent); color: #fff; }
+    .profile-btn-primary:hover { opacity: .88; }
+
+    .profile-btn-outline {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .profile-btn-outline:hover { border-color: var(--muted); }
+
+    .profile-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.25);
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    .profile-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 
     /* ── Footer ────────────────────────────────────── */
 
@@ -894,7 +1070,7 @@
     <strong>Your data never leaves your browser.</strong>
     Once uploaded, open <strong>Settings ⚙</strong> (top right) to save your data in the browser — so you don't need to re-upload next time.
   </p>
-  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.4 · 2026-03-31</p>
+  <p style="font-size:.72rem;color:#bbb;margin-top:1.5rem;">v2.5 · 2026-03-31</p>
 </div>
 
 <!-- ── Dashboard ──────────────────────────────────────────────────────────── -->
@@ -1005,6 +1181,8 @@
     <button class="tab-btn" data-tab="search">🔍 Search</button>
     <button class="tab-btn" data-tab="timeline">📅 Timeline</button>
     <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Marked for Download</button>
+    <div style="flex:1"></div>
+    <button class="tab-btn tab-btn-pill" data-tab="profile">💬 ChatGPT Me</button>
   </div>
 
   <!-- Overview -->
@@ -1064,6 +1242,7 @@
     <div class="intro-block">
       <h2>Marked for Download</h2>
       <p>Conversations you've marked with the <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
+      <p style="margin-top:.5rem">You can share downloaded conversations with your favorite AI for analysis or experience mining — surfacing patterns, themes, or insights across a set of related exchanges. Keep file size limits in mind: if you're attaching conversations directly, start with a focused selection rather than everything at once.</p>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
@@ -1090,7 +1269,10 @@
       <p>See how your focus shifted month by month. Toggle topics on and off using the chips below the chart to compare specific themes. The emoji on each data point matches the topic — hover for the exact count, or click to see which conversations contributed to that data point.</p>
     </div>
     <div class="card">
-      <h2>Monthly Breakdown by Topic</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem">
+        <h2 style="margin:0">Monthly Breakdown by Topic</h2>
+        <button id="timeline-clear-btn" onclick="clearTimelineTopics()" style="background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--muted);padding:0">Clear all</button>
+      </div>
       <p class="card-desc">Toggle topics below to focus the view. Showing your top topics by default.</p>
       <div id="timeline-controls"></div>
       <div class="chart-wrap" style="height:380px"><canvas id="timeline-chart"></canvas></div>
@@ -1098,12 +1280,83 @@
   </div>
 </div>
 
+  <!-- ChatGPT Me -->
+  <div class="tab-panel" id="tab-profile">
+    <div class="intro-block">
+      <h2>ChatGPT Me</h2>
+      <p>Extract your side of every conversation — your messages only, not the AI's responses — into a text file you can hand to any AI assistant. Use it to build a personal profile, summarize your working style, or give a new AI context about how you think and what you work on.</p>
+      <p style="margin-top:.6rem;color:var(--muted);font-size:.9rem">Select a file size limit below, then click <strong>Extract</strong>. Larger exports include more history but may be too big to attach directly — 10 MB is a good starting point. Once extracted, download the data file and the prompt, attach both to a new AI conversation, and paste the cover message to get started.</p>
+    </div>
+    <div class="card">
+      <div id="profile-stats-row" style="display:none">
+        <div class="stat-card">
+          <div class="label">Conversations</div>
+          <div class="value" id="profile-stat-convos">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Your Messages</div>
+          <div class="value" id="profile-stat-messages">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Est. Words</div>
+          <div class="value" id="profile-stat-words">—</div>
+        </div>
+      </div>
+
+      <div class="profile-seg-wrap">
+        <span class="profile-seg-label">Size limit</span>
+        <div class="profile-seg" id="profile-cap-seg">
+          <button class="profile-seg-btn" data-cap="2" onclick="setProfileCap(this)">2 MB</button>
+          <button class="profile-seg-btn" data-cap="5" onclick="setProfileCap(this)">5 MB</button>
+          <button class="profile-seg-btn active" data-cap="10" onclick="setProfileCap(this)">10 MB</button>
+          <button class="profile-seg-btn" data-cap="0" onclick="setProfileCap(this)">All</button>
+          <button class="profile-seg-btn" data-cap="custom" onclick="setProfileCap(this)">Custom</button>
+        </div>
+        <div class="profile-cap-custom" id="profile-cap-custom">
+          <input class="profile-cap-input" type="number" id="profile-cap-input" value="10" min="1" max="9999" />
+          <span>MB</span>
+        </div>
+        <button class="profile-btn profile-btn-primary" onclick="renderProfileTab()">Extract</button>
+      </div>
+
+      <div class="profile-cap-status" id="profile-cap-status"></div>
+
+      <div id="profile-results" style="display:none">
+        <div class="profile-section-label">Step 1 — Download your extracted data</div>
+        <div class="profile-section-sub">Your conversation titles and messages, formatted as plain text. Attach this file to a new AI conversation.</div>
+        <div class="profile-btn-row">
+          <button class="profile-btn profile-btn-primary" onclick="downloadProfileData()">
+            Download extracted data (.txt) <span class="profile-badge" id="profile-size-badge"></span>
+          </button>
+        </div>
+
+        <hr class="profile-divider">
+
+        <div class="profile-section-label">Step 2 — Edit and download the analysis prompt</div>
+        <div class="profile-section-sub">Instructions telling the AI what to do with your data. Edit if you want, then download and attach it alongside the data file.</div>
+        <textarea class="profile-prompt-textarea" id="profile-prompt-textarea" spellcheck="false"></textarea>
+        <div class="profile-btn-row">
+          <button class="profile-btn profile-btn-outline" onclick="downloadProfilePrompt()">Download prompt (.txt)</button>
+        </div>
+
+        <hr class="profile-divider">
+
+        <div class="profile-section-label">Step 3 — Copy the cover message</div>
+        <div class="profile-section-sub">Paste this as your opening message after attaching both files. It tells the AI what it's looking at.</div>
+        <div class="profile-cover-box" id="profile-cover-box"></div>
+        <div class="profile-btn-row">
+          <button class="profile-btn profile-btn-outline" id="profile-copy-btn" onclick="copyProfileCoverMessage()">Copy cover message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
 
 <footer>
   <span>Built by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></span>
   <span class="footer-divider">·</span>
-  <span>v2.4 · 2026-03-31</span>
+  <span>v2.5 · 2026-03-31</span>
 </footer>
 
 <!-- ── Conversation drawer ────────────────────────────────────────────────── -->
@@ -1806,9 +2059,7 @@ function renderTimeline() {
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   });
 
-  const topics = activeTimelineTopics.size
-    ? [...activeTimelineTopics]
-    : Object.keys(TOPICS).slice(0, 5);
+  const topics = [...activeTimelineTopics];
 
   const datasets = topics.map((topic, i) => ({
     label: topic,
@@ -2381,6 +2632,13 @@ function renderTimelineControls(topicCounts) {
     });
     controls.appendChild(chip);
   }
+
+}
+
+function clearTimelineTopics() {
+  activeTimelineTopics.clear();
+  document.querySelectorAll('#timeline-controls .tl-chip').forEach(c => c.classList.remove('active'));
+  renderTimeline();
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
@@ -2740,6 +2998,190 @@ function downloadJSON(data, filename) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Claude Profile tab ────────────────────────────────────────────────────────
+
+function setProfileCap(btn) {
+  document.querySelectorAll('.profile-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const custom = document.getElementById('profile-cap-custom');
+  if (btn.dataset.cap === 'custom') {
+    custom.classList.add('visible');
+  } else {
+    custom.classList.remove('visible');
+  }
+}
+
+function getProfileCapBytes() {
+  const active = document.querySelector('.profile-seg-btn.active');
+  if (!active) return 10 * 1024 * 1024;
+  if (active.dataset.cap === '0') return Infinity;
+  if (active.dataset.cap === 'custom') {
+    const val = parseFloat(document.getElementById('profile-cap-input').value) || 10;
+    return val * 1024 * 1024;
+  }
+  return parseFloat(active.dataset.cap) * 1024 * 1024;
+}
+
+function buildProfileOutput(capBytes = Infinity) {
+  const sorted = [...allConversations].sort((a, b) => b.date - a.date);
+
+  let userMessageCount = 0;
+  let wordCount = 0;
+  const lines = [];
+
+  lines.push('=== CHATGPT PROFILE EXPORT ===');
+  lines.push('Extracted: ' + new Date().toLocaleDateString());
+  lines.push('Conversations analyzed: ' + sorted.length + ' (most recent first)');
+  lines.push('');
+  lines.push('--- CONVERSATION TITLES ---');
+
+  sorted
+    .map(c => (c.title || '').trim())
+    .filter(t => t.length > 2 && t !== 'New conversation')
+    .forEach(t => lines.push('• ' + t));
+
+  lines.push('');
+  lines.push('--- YOUR MESSAGES (user turns only) ---');
+  lines.push('');
+
+  let byteCount = new Blob([lines.join('\n')]).size;
+  let capped = false;
+
+  for (const convo of sorted) {
+    if (capped) break;
+    const userMsgs = convo.messages.filter(m => m.role === 'user').map(m => m.text).filter(t => t && t.trim().length > 10);
+    if (userMsgs.length === 0) continue;
+
+    const dateStr = convo.date ? convo.date.toLocaleDateString() : '';
+    const titleLine = '[' + (dateStr ? dateStr + ' — ' : '') + (convo.title || 'Untitled').trim() + ']';
+    const convoLines = [titleLine];
+
+    for (const msg of userMsgs) {
+      const line = '> ' + msg.replace(/\n+/g, ' ').trim();
+      const lineBytes = new Blob([line]).size;
+      if (byteCount + lineBytes > capBytes) { capped = true; break; }
+      convoLines.push(line);
+      byteCount += lineBytes;
+      userMessageCount++;
+      wordCount += msg.split(/\s+/).length;
+    }
+
+    if (convoLines.length > 1) {
+      lines.push(...convoLines);
+      lines.push('');
+    }
+  }
+
+  if (capped) {
+    const capLabel = capBytes === Infinity ? 'unlimited' : (capBytes / 1024 / 1024).toFixed(0) + ' MB';
+    lines.push('[Output capped at ' + capLabel + ' — conversations are ordered newest first, so your most recent history is included]');
+  }
+
+  return { output: lines.join('\n'), userMessageCount, wordCount, capped };
+}
+
+function buildProfilePrompt() {
+  return `I'm sharing my extracted ChatGPT conversation history in the attached file. Please analyze it and build me a working profile by answering:
+
+1. **Topics & domains** — What subjects do I work on most? What are my top 5–10 recurring areas?
+
+2. **Task types** — What kinds of tasks do I use AI for? (e.g. coding, writing, analysis, research, brainstorming, personal decisions)
+
+3. **How I prompt** — How do I tend to phrase requests? Do I give lots of context or keep things brief? Do I iterate or front-load details?
+
+4. **Response style preferences** — Based on my follow-up questions and what I accept vs. push back on, what kind of responses work best for me? (length, format, tone, structure)
+
+5. **Recurring projects or themes** — Are there long-running projects, goals, or interests that appear across multiple conversations?
+
+6. **Domain expertise & vocabulary** — What jargon or domain-specific language do I use? What can you infer about my expertise level in different areas?
+
+7. **What to avoid** — Are there patterns where I corrected the AI or expressed frustration? What should Claude avoid doing?
+
+8. **My prompting style** — Do I share full documents, snippets, or describe things abstractly? Do I ask iterative follow-ups or prefer one-shot answers?
+
+At the end, synthesize this into a **Personal System Prompt** — a short paragraph (150–250 words) that captures who I am, what I work on, and how I prefer to collaborate.`;
+}
+
+function buildProfileCoverMessage() {
+  return `I've attached two files:
+
+1. chatgpt-profile-data.txt — my ChatGPT conversation history, filtered to show only my messages (not the AI responses), plus all conversation titles.
+
+2. chatgpt-profile-prompt.txt — instructions for what I'd like you to do with this data.
+
+Please read both files and follow the instructions in the prompt file.`;
+}
+
+function renderProfileTab() {
+  const capBytes = getProfileCapBytes();
+  const { output, userMessageCount, wordCount, capped } = buildProfileOutput(capBytes);
+
+  window._profileOutputText = output;
+
+  const sizeBytes = new Blob([output]).size;
+  const sizeFmt = sizeBytes > 1024 * 1024
+    ? (sizeBytes / 1024 / 1024).toFixed(1) + ' MB'
+    : Math.round(sizeBytes / 1024) + ' KB';
+
+  // Stats
+  const statsRow = document.getElementById('profile-stats-row');
+  statsRow.style.display = 'grid';
+  document.getElementById('profile-stat-convos').textContent = allConversations.length.toLocaleString();
+  document.getElementById('profile-stat-messages').textContent = userMessageCount.toLocaleString();
+  document.getElementById('profile-stat-words').textContent = wordCount.toLocaleString();
+
+  // Cap status
+  const capStatus = document.getElementById('profile-cap-status');
+  capStatus.className = 'profile-cap-status ' + (capped ? 'capped' : 'complete');
+  capStatus.textContent = capped
+    ? 'Cap reached — includes your most recent conversations up to ' + sizeFmt
+    : 'All data included — ' + sizeFmt + ' total';
+
+  // Size badge
+  document.getElementById('profile-size-badge').textContent = sizeFmt;
+
+  // Prompt textarea
+  document.getElementById('profile-prompt-textarea').value = buildProfilePrompt();
+
+  // Cover message
+  document.getElementById('profile-cover-box').textContent = buildProfileCoverMessage();
+
+  // Show results
+  document.getElementById('profile-results').style.display = 'block';
+}
+
+function downloadProfileData() {
+  if (!window._profileOutputText) return;
+  const blob = new Blob([window._profileOutputText], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'chatgpt-profile-data.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadProfilePrompt() {
+  const text = document.getElementById('profile-prompt-textarea').value;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'chatgpt-profile-prompt.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyProfileCoverMessage() {
+  const text = buildProfileCoverMessage();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('profile-copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
 }
 </script>
 </body>
