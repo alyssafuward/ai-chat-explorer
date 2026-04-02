@@ -55,6 +55,7 @@ test.describe('After uploading a JSON file', () => {
   });
 
   test('reset returns to upload screen with drop zone restored', async ({ page }) => {
+    page.on('dialog', dialog => dialog.accept());
     await page.locator('#reset-btn').click();
     await expect(page.locator('#upload-screen')).toBeVisible();
     await expect(page.locator('#dashboard')).toBeHidden();
