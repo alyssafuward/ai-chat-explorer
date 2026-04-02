@@ -427,6 +427,7 @@
 
     .convo-title { font-size: .9rem; color: var(--text); flex: 1; }
     .convo-date { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+    .convo-account-badge { font-size: .7rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: .1rem .5rem; white-space: nowrap; flex-shrink: 0; }
 
     .mark-btn {
       background: none;
@@ -476,7 +477,7 @@
       gap: .75rem;
     }
     .dl-item:last-child { border-bottom: none; }
-    .dl-title { font-size: .9rem; color: var(--text); flex: 1; }
+    .dl-title { font-size: .9rem; color: var(--text); }
     .dl-meta { font-size: .78rem; color: var(--muted); white-space: nowrap; }
     .dl-remove {
       background: none;
@@ -1283,7 +1284,7 @@
     <button class="tab-btn" data-tab="topics">🗺️ Topics</button>
     <button class="tab-btn" data-tab="search">🔍 Search</button>
     <button class="tab-btn" data-tab="timeline">📅 Timeline</button>
-    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Marked for Download</button>
+    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Pinned</button>
     <div style="flex:1"></div>
     <button class="tab-btn tab-btn-pill" data-tab="profile">💬 ChatGPT Me</button>
   </div>
@@ -1343,14 +1344,17 @@
   <!-- Downloads -->
   <div class="tab-panel" id="tab-downloads">
     <div class="intro-block">
-      <h2>Marked for Download</h2>
-      <p>Conversations you've marked with the <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
+      <h2>Pinned</h2>
+      <p>Conversations you've pinned with the <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
       <p style="margin-top:.5rem">You can share downloaded conversations with your favorite AI for analysis or experience mining — surfacing patterns, themes, or insights across a set of related exchanges. Keep file size limits in mind: if you're attaching conversations directly, start with a focused selection rather than everything at once.</p>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
         <h2>Ready to Download</h2>
-        <button id="download-all-btn" disabled style="flex-shrink:0">⬇ Download All as ZIP</button>
+        <div style="display:flex;gap:.5rem;flex-shrink:0">
+          <button id="unpin-all-btn" class="settings-btn" disabled style="font-size:.78rem;padding:.25rem .7rem">Unpin All</button>
+          <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
+        </div>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:.4rem">
         <select id="download-sort" style="font-size:.78rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer">
@@ -1360,7 +1364,7 @@
         </select>
       </div>
       <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
-      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations marked yet. Click the pin icon on any conversation to mark it for download.</div>
+      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations pinned yet. Click the pin icon on any conversation to add it here.</div>
       <div id="download-list"></div>
     </div>
   </div>
@@ -1506,7 +1510,7 @@
     <div id="drawer-header">
       <button id="drawer-close">✕</button>
       <button id="drawer-download" title="Download conversation">⬇</button>
-      <button id="drawer-mark" title="Mark for download"></button>
+      <button id="drawer-mark" title="Pin for download"></button>
       <div id="drawer-title"></div>
       <div id="drawer-meta"></div>
     </div>
@@ -1879,6 +1883,18 @@ let activeTimelineTopics = new Set();
 let activeAccounts = new Set();
 let savedData = null; // set by checkForSavedData if saved data exists in IndexedDB
 let topicColorMap = {};
+
+function multipleAccountsLoaded() {
+  return document.getElementById('account-filter-bar').style.display !== 'none';
+}
+
+function makeAccountBadge(account) {
+  if (!multipleAccountsLoaded()) return null;
+  const badge = document.createElement('span');
+  badge.className = 'convo-account-badge';
+  badge.textContent = account || 'Unknown';
+  return badge;
+}
 
 function getActiveConversations() {
   if (activeAccounts.size === 0) return allConversations;
@@ -2468,7 +2484,7 @@ function showTopicConversations(topic) {
   selectBtn.className = 'settings-btn';
   selectBtn.style.cssText = 'font-size:.78rem;padding:.25rem .7rem';
   const allMarked = () => convos.every(c => markedForDownload.has(c));
-  const updateSelectBtn = () => { selectBtn.textContent = allMarked() ? 'Deselect All' : 'Select All'; };
+  const updateSelectBtn = () => { selectBtn.textContent = allMarked() ? 'Unpin All' : 'Pin All'; };
   updateSelectBtn();
   selectBtn.addEventListener('click', () => {
     if (allMarked()) {
@@ -2494,6 +2510,8 @@ function showTopicConversations(topic) {
     d.className = 'convo-date';
     d.textContent = c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     item.appendChild(t);
+    const badge = makeAccountBadge(c._account);
+    if (badge) item.appendChild(badge);
     item.appendChild(d);
     item.appendChild(makeMarkBtn(c));
     item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
@@ -2518,8 +2536,9 @@ function openConversation(convo) {
   const msgsEl  = document.getElementById('drawer-messages');
 
   titleEl.textContent = convo.title;
+  const accountSuffix = multipleAccountsLoaded() ? ' · ' + (convo._account || 'Unknown') : '';
   metaEl.textContent  = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-                      + ' · ' + convo.topic;
+                      + ' · ' + convo.topic + accountSuffix;
 
   msgsEl.innerHTML = '';
 
@@ -2554,7 +2573,7 @@ function openConversation(convo) {
   const isMarked = markedForDownload.has(convo);
   drawerMark.classList.toggle('marked', isMarked);
   drawerMark.innerHTML = bookmarkSVG(isMarked);
-  drawerMark.title = isMarked ? 'Remove from downloads' : 'Mark for download';
+  drawerMark.title = isMarked ? 'Unpin' : 'Pin for download';
   drawerMark.onclick = () => toggleMark(convo);
 
   overlay.classList.add('open');
@@ -2562,7 +2581,7 @@ function openConversation(convo) {
   document.body.style.overflow = 'hidden';
 }
 
-// ── Mark for download ────────────────────────────────────────────────────────
+// ── Pin for download ────────────────────────────────────────────────────────
 
 const markedForDownload = new Set();
 
@@ -2583,14 +2602,14 @@ function updateMarkUI(convo) {
   const drawerMark = document.getElementById('drawer-mark');
   if (drawerMark && drawerMark._convo === convo) {
     drawerMark.classList.toggle('marked', marked);
-    drawerMark.title = marked ? 'Remove from downloads' : 'Mark for download';
+    drawerMark.title = marked ? 'Unpin' : 'Pin for download';
   }
   // Update all mark buttons in lists
   document.querySelectorAll('.mark-btn').forEach(btn => {
     if (btn._convo === convo) {
       btn.classList.toggle('marked', marked);
       btn.innerHTML = bookmarkSVG(marked);
-      btn.title = marked ? 'Remove from downloads' : 'Mark for download';
+      btn.title = marked ? 'Unpin' : 'Pin for download';
     }
   });
 }
@@ -2619,7 +2638,7 @@ function makeMarkBtn(convo) {
   const marked = markedForDownload.has(convo);
   btn.className = 'mark-btn' + (marked ? ' marked' : '');
   btn.innerHTML = bookmarkSVG(marked);
-  btn.title = marked ? 'Remove from downloads' : 'Mark for download';
+  btn.title = marked ? 'Unpin' : 'Pin for download';
   btn._convo = convo;
   btn.addEventListener('click', e => { e.stopPropagation(); toggleMark(convo); });
   return btn;
@@ -2629,6 +2648,7 @@ function renderDownloadsTab() {
   const list = document.getElementById('download-list');
   const empty = document.getElementById('download-empty');
   const dlBtn = document.getElementById('download-all-btn');
+  const unpinAllBtn = document.getElementById('unpin-all-btn');
   list.innerHTML = '';
 
   const sizeEl = document.getElementById('download-size');
@@ -2636,12 +2656,14 @@ function renderDownloadsTab() {
   if (markedForDownload.size === 0) {
     empty.style.display = 'block';
     dlBtn.disabled = true;
+    unpinAllBtn.disabled = true;
     sizeEl.textContent = '';
     return;
   }
 
   empty.style.display = 'none';
   dlBtn.disabled = false;
+  unpinAllBtn.disabled = false;
 
   const sort = document.getElementById('download-sort').value;
   const convos = [...markedForDownload].sort((a, b) => {
@@ -2662,11 +2684,14 @@ function renderDownloadsTab() {
     const item = document.createElement('div');
     item.className = 'dl-item';
 
+    const titleWrap = document.createElement('div');
+    titleWrap.style.cssText = 'display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;flex:1;min-width:0';
     const title = document.createElement('span');
     title.className = 'dl-title';
     title.textContent = convo.title;
     title.style.cursor = 'pointer';
     title.addEventListener('click', () => openConversation(convo));
+    titleWrap.appendChild(title);
 
     const convoChars = convo.messages.reduce((s, m) => s + m.text.length, 0);
     const convoSize = convoChars > 1024 * 1024 ? (convoChars / 1024 / 1024).toFixed(1) + ' MB' : Math.round(convoChars / 1024) + ' KB';
@@ -2675,7 +2700,8 @@ function renderDownloadsTab() {
     meta.className = 'dl-meta';
     meta.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem';
     const metaDate = document.createElement('span');
-    metaDate.textContent = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const dateStr = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    metaDate.textContent = multipleAccountsLoaded() ? (convo._account || 'Unknown') + ' · ' + dateStr : dateStr;
     const metaTopic = document.createElement('span');
     metaTopic.style.cssText = 'font-size:.72rem;color:var(--muted)';
     metaTopic.textContent = convo.topic + ' · ' + convoSize;
@@ -2688,7 +2714,7 @@ function renderDownloadsTab() {
 
     meta.appendChild(metaDate);
     meta.appendChild(metaTopic);
-    item.appendChild(title);
+    item.appendChild(titleWrap);
     item.appendChild(meta);
     item.appendChild(remove);
     list.appendChild(item);
@@ -2699,7 +2725,8 @@ async function downloadAllMarked() {
   const zip = new JSZip();
   for (const convo of markedForDownload) {
     const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    const lines = [convo.title, `${date} · ${convo.topic}`, '', '---', ''];
+    const accountLine = convo._account ? `Dataset: ${convo._account}` : null;
+    const lines = [convo.title, `${date} · ${convo.topic}`, ...(accountLine ? [accountLine] : []), '', '---', ''];
     for (const msg of convo.messages) {
       if (!['user', 'assistant'].includes(msg.role)) continue;
       lines.push(msg.role === 'user' ? 'You:' : 'ChatGPT:');
@@ -2719,11 +2746,17 @@ async function downloadAllMarked() {
 }
 
 document.getElementById('download-all-btn').addEventListener('click', downloadAllMarked);
+document.getElementById('unpin-all-btn').addEventListener('click', () => {
+  [...markedForDownload].forEach(c => { markedForDownload.delete(c); updateMarkUI(c); });
+  updateDownloadsBadge();
+  renderDownloadsTab();
+});
 document.getElementById('download-sort').addEventListener('change', renderDownloadsTab);
 
 function downloadConversation(convo) {
   const date = convo.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  const lines = [`${convo.title}`, `${date} · ${convo.topic}`, '', '---', ''];
+  const accountLine = convo._account ? `Dataset: ${convo._account}` : null;
+  const lines = [`${convo.title}`, `${date} · ${convo.topic}`, ...(accountLine ? [accountLine] : []), '', '---', ''];
   for (const msg of convo.messages) {
     if (!['user', 'assistant'].includes(msg.role)) continue;
     const speaker = msg.role === 'user' ? 'You' : 'ChatGPT';
@@ -2760,6 +2793,29 @@ document.addEventListener('keydown', e => {
 
 function openDrilldown(title, convos) {
   document.getElementById('drilldown-title').textContent = title;
+
+  // Pin all / Unpin all button
+  const existingPinBtn = document.getElementById('drilldown-pin-all-btn');
+  if (existingPinBtn) existingPinBtn.remove();
+  const pinBtn = document.createElement('button');
+  pinBtn.id = 'drilldown-pin-all-btn';
+  pinBtn.className = 'settings-btn';
+  pinBtn.style.cssText = 'font-size:.78rem;padding:.25rem .7rem;margin-left:auto';
+  const allPinned = () => convos.every(c => markedForDownload.has(c));
+  const updatePinBtn = () => { pinBtn.textContent = allPinned() ? 'Unpin All' : 'Pin All'; };
+  updatePinBtn();
+  pinBtn.addEventListener('click', () => {
+    if (allPinned()) {
+      convos.forEach(c => markedForDownload.delete(c));
+    } else {
+      convos.forEach(c => markedForDownload.add(c));
+    }
+    updatePinBtn();
+    convos.forEach(c => updateMarkUI(c));
+    updateDownloadsBadge();
+  });
+  document.getElementById('drilldown-header').appendChild(pinBtn);
+
   const list = document.getElementById('drilldown-list');
   list.innerHTML = '';
   for (const c of convos) {
@@ -2772,6 +2828,8 @@ function openDrilldown(title, convos) {
     d.className = 'convo-date';
     d.textContent = c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     item.appendChild(t);
+    const badge = makeAccountBadge(c._account);
+    if (badge) item.appendChild(badge);
     item.appendChild(d);
     item.appendChild(makeMarkBtn(c));
     item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
@@ -2869,7 +2927,7 @@ function runSearch(query) {
 
     const rmeta = document.createElement('div');
     rmeta.className = 'r-meta';
-    rmeta.textContent = c.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + c.topic;
+    rmeta.textContent = c.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + c.topic + (multipleAccountsLoaded() ? ' · ' + (c._account || 'Unknown') : '');
 
     item.appendChild(rtitle);
     item.appendChild(rmeta);
@@ -3339,6 +3397,7 @@ document.getElementById('export-data-btn').addEventListener('click', () => {
   const exportable = allConversations.map(c => ({
     _key:     c._key,
     _batchId: c._batchId,
+    _account: c._account,
     title: c.title,
     date: c.date.toISOString(),
     topic: c.topic,
@@ -3417,7 +3476,8 @@ function buildProfileOutput(capBytes = Infinity) {
     if (userMsgs.length === 0) continue;
 
     const dateStr = convo.date ? convo.date.toLocaleDateString() : '';
-    const titleLine = '[' + (dateStr ? dateStr + ' — ' : '') + (convo.title || 'Untitled').trim() + ']';
+    const accountPart = convo._account ? ' · ' + convo._account : '';
+    const titleLine = '[' + (dateStr ? dateStr + ' — ' : '') + (convo.title || 'Untitled').trim() + accountPart + ']';
     const convoLines = [titleLine];
 
     for (const msg of userMsgs) {
