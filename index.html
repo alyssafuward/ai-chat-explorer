@@ -14,9 +14,9 @@
       --bg:        #FAFAF8;
       --surface:   #FFFFFF;
       --border:    #E8E4DF;
-      --accent:    #C05F3C;
-      --accent2:   #E8956D;
-      --accent3:   #F5C9A0;
+      --accent:    #F28F4B;
+      --accent2:   #F5A975;
+      --accent3:   #F9C8A0;
       --text:      #2D2D2D;
       --muted:     #777777;
       --radius:    10px;
@@ -1284,7 +1284,7 @@
     <button class="tab-btn" data-tab="topics">🗺️ Topics</button>
     <button class="tab-btn" data-tab="search">🔍 Search</button>
     <button class="tab-btn" data-tab="timeline">📅 Timeline</button>
-    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Pinned</button>
+    <button class="tab-btn" data-tab="downloads" id="downloads-tab-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:.3rem;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> Pinned for Download</button>
     <div style="flex:1"></div>
     <button class="tab-btn tab-btn-pill" data-tab="profile">💬 ChatGPT Me</button>
   </div>
@@ -1344,7 +1344,7 @@
   <!-- Downloads -->
   <div class="tab-panel" id="tab-downloads">
     <div class="intro-block">
-      <h2>Pinned</h2>
+      <h2>Pinned for Download</h2>
       <p>Conversations you've pinned with the <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;color:var(--accent)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> icon appear here. Download them individually from the conversation drawer, or download all at once as a ZIP.</p>
       <p style="margin-top:.5rem">You can share downloaded conversations with your favorite AI for analysis or experience mining — surfacing patterns, themes, or insights across a set of related exchanges. Keep file size limits in mind: if you're attaching conversations directly, start with a focused selection rather than everything at once.</p>
     </div>
@@ -1352,8 +1352,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
         <h2>Ready to Download</h2>
         <div style="display:flex;gap:.5rem;flex-shrink:0">
-          <button id="unpin-all-btn" class="settings-btn" disabled style="font-size:.78rem;padding:.25rem .7rem">Unpin All</button>
           <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
+          <button id="unpin-all-btn" class="settings-btn" disabled style="font-size:.78rem;padding:.6rem 1rem">Unpin All</button>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:.4rem">
@@ -1364,7 +1364,7 @@
         </select>
       </div>
       <div id="download-size" style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem"></div>
-      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations pinned yet. Click the pin icon on any conversation to add it here.</div>
+      <div id="download-empty" style="font-size:.9rem;color:var(--muted);padding:.75rem 0">No conversations pinned for download yet. Click the pin icon on any conversation to add it here.</div>
       <div id="download-list"></div>
     </div>
   </div>
@@ -2805,16 +2805,16 @@ function openDrilldown(title, convos) {
   const updatePinBtn = () => { pinBtn.textContent = allPinned() ? 'Unpin All' : 'Pin All'; };
   updatePinBtn();
   pinBtn.addEventListener('click', () => {
-    if (allPinned()) {
-      convos.forEach(c => markedForDownload.delete(c));
-    } else {
-      convos.forEach(c => markedForDownload.add(c));
-    }
-    updatePinBtn();
-    convos.forEach(c => updateMarkUI(c));
-    updateDownloadsBadge();
-  });
-  document.getElementById('drilldown-header').appendChild(pinBtn);
+  if (allPinned()) {
+    convos.forEach(c => markedForDownload.delete(c));
+  } else {
+    convos.forEach(c => markedForDownload.add(c));
+  }
+  updatePinBtn();
+  convos.forEach(c => updateMarkUI(c));
+  updateDownloadsBadge();
+  renderDownloadsTab();
+  });  document.getElementById('drilldown-header').appendChild(pinBtn);
 
   const list = document.getElementById('drilldown-list');
   list.innerHTML = '';
