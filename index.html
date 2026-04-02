@@ -582,6 +582,42 @@
 
     .tl-chip.active { border-color: var(--accent); color: var(--accent); background: #FEF4EE; font-weight: 600; }
 
+    /* ── Account filter bar ────────────────────────── */
+
+    #account-filter-bar {
+      display: none;
+      align-items: center;
+      gap: .4rem;
+      flex-wrap: wrap;
+      padding: .6rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #account-filter-label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-right: .25rem;
+      white-space: nowrap;
+    }
+
+    .acct-chip {
+      padding: .3rem .85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      font-size: .82rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .acct-chip:hover { border-color: var(--accent); color: var(--text); }
+    .acct-chip.active { border-color: var(--accent); color: var(--accent); background: #FEF4EE; font-weight: 600; }
+
     /* ── Claude Profile tab ────────────────────────── */
 
     #profile-stats-row {
@@ -858,6 +894,69 @@
       align-self: center;
     }
     #merge-cancel-btn:hover { color: var(--text); }
+
+    /* ── Account naming dialog ───────────────────── */
+
+    #naming-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 300;
+      backdrop-filter: blur(2px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #naming-overlay.open { display: flex; }
+
+    #naming-dialog {
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 2rem;
+      width: min(440px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    #naming-dialog h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 0; }
+    #naming-dialog p { font-size: .9rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+    #naming-rows { display: flex; flex-direction: column; gap: .75rem; }
+
+    .naming-row {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+
+    .naming-row label { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+
+    .naming-row input {
+      padding: .55rem .75rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: .92rem;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .naming-row input:focus { outline: none; border-color: var(--accent); }
+
+    #naming-confirm-btn {
+      padding: .65rem 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #naming-confirm-btn:hover { background: #b05535; }
 
     /* ── Chart drill-down overlay ─────────────────── */
 
@@ -1175,6 +1274,10 @@
     </div>
   </div>
 
+  <div id="account-filter-bar">
+    <span id="account-filter-label">Account</span>
+  </div>
+
   <div id="tab-nav">
     <button class="tab-btn active" data-tab="overview">📊 Overview</button>
     <button class="tab-btn" data-tab="topics">🗺️ Topics</button>
@@ -1372,6 +1475,17 @@
       <button id="merge-replace-btn">Replace everything — start fresh</button>
     </div>
     <button id="merge-cancel-btn">Cancel</button>
+  </div>
+</div>
+
+<!-- ── Account naming dialog ──────────────────────────────────────────────── -->
+
+<div id="naming-overlay">
+  <div id="naming-dialog">
+    <h3>Name your accounts</h3>
+    <p>We found multiple accounts in your upload. Confirm or edit the names below — you can always rename them later in Settings.</p>
+    <div id="naming-rows"></div>
+    <button id="naming-confirm-btn">Continue</button>
   </div>
 </div>
 
@@ -1717,6 +1831,20 @@ function showMergeDialog({ desc, onAdd, onReplace, onCancel }) {
 }
 
 function maybeParseFiles(files) {
+  if (allConversations.length === 0 && savedData) {
+    // Saved data exists but hasn't been loaded yet — treat it as existing data
+    const conversations = savedData.conversations;
+    showMergeDialog({
+      desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
+      onAdd: () => {
+        savedData = null;
+        allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
+        parseFiles(files, 'merge');
+      },
+      onReplace: () => { savedData = null; parseFiles(files, 'replace'); },
+    });
+    return;
+  }
   if (allConversations.length === 0) {
     parseFiles(files, 'replace');
     return;
@@ -1748,7 +1876,72 @@ function openFilePicker(mode, preloadConversations) {
 let allConversations = [];
 let monthlyChart, topicBarChart, timelineChart;
 let activeTimelineTopics = new Set();
+let activeAccounts = new Set();
+let savedData = null; // set by checkForSavedData if saved data exists in IndexedDB
 let topicColorMap = {};
+
+function getActiveConversations() {
+  if (activeAccounts.size === 0) return allConversations;
+  return allConversations.filter(c => activeAccounts.has(c._account || 'Unknown'));
+}
+
+function buildAccountFilterBar() {
+  const bar = document.getElementById('account-filter-bar');
+  const accounts = [...new Set(allConversations.map(c => c._account || 'Unknown'))];
+
+  if (accounts.length < 2) {
+    bar.style.display = 'none';
+    activeAccounts.clear();
+    return;
+  }
+
+  // Opt-in pattern: empty activeAccounts = show all (no chip selected)
+  // Prune any stale selections that no longer exist
+  for (const a of [...activeAccounts]) {
+    if (!accounts.includes(a)) activeAccounts.delete(a);
+  }
+
+  bar.style.display = 'flex';
+
+  const label = document.getElementById('account-filter-label');
+  [...bar.children].forEach(el => { if (el !== label) el.remove(); });
+
+  const isAllMode = () => activeAccounts.size === 0;
+
+  const renderChips = () => {
+    [...bar.children].forEach(el => { if (el !== label) el.remove(); });
+
+    // "All" chip — active when no individual filter is set
+    const allChip = document.createElement('button');
+    allChip.className = 'acct-chip' + (isAllMode() ? ' active' : '');
+    allChip.textContent = 'All';
+    allChip.addEventListener('click', () => {
+      if (isAllMode()) return;
+      activeAccounts.clear();
+      renderChips();
+      renderDashboard();
+    });
+    bar.appendChild(allChip);
+
+    for (const account of accounts) {
+      const chip = document.createElement('button');
+      chip.className = 'acct-chip' + (activeAccounts.has(account) ? ' active' : '');
+      chip.textContent = account;
+      chip.addEventListener('click', () => {
+        if (activeAccounts.has(account)) {
+          activeAccounts.delete(account);
+        } else {
+          activeAccounts.add(account);
+        }
+        renderChips();
+        renderDashboard();
+      });
+      bar.appendChild(chip);
+    }
+  };
+
+  renderChips();
+}
 
 async function parseFiles(files, mode = 'replace') {
   const batchId   = Date.now();
@@ -1765,22 +1958,91 @@ async function parseFiles(files, mode = 'replace') {
   dz.innerHTML = '<div class="icon">⏳</div><p>Reading your files…</p>';
 
   try {
-    const raw = [];
+    // ── Pass 1: read files, group by source, detect accounts ──────────────────
+    // Each entry: { raw: [], accountLabel: string, filename: string }
+    const sources = [];
+    const existingAccounts = new Set(allConversations.map(c => c._account).filter(Boolean));
+    let autoN = 1;
+    while (existingAccounts.has('Account ' + autoN)) autoN++;
+
+    const nonJsonRaw = []; // direct JSON files share one unnamed source
 
     for (const file of files) {
       if (file.name.endsWith('.zip')) {
         const zip = await JSZip.loadAsync(file);
+        let accountLabel = null;
+        const userEntry = Object.values(zip.files).find(f => f.name.match(/user\.json$/i));
+        if (userEntry) {
+          try {
+            const userData = JSON.parse(await userEntry.async('text'));
+            if (userData.email) accountLabel = userData.email;
+          } catch (e) { /* ignore */ }
+        }
+        if (!accountLabel) {
+          accountLabel = 'Account ' + autoN++;
+        }
         const jsonEntries = Object.values(zip.files)
           .filter(f => f.name.match(/conversations.*\.json$/i));
         if (jsonEntries.length === 0) throw new Error(`No conversations JSON found inside ${file.name}.`);
+        const raw = [];
         for (const entry of jsonEntries) {
           const text = await entry.async('text');
           raw.push(...JSON.parse(text));
         }
+        sources.push({ raw, accountLabel, filename: file.name });
       } else {
-        raw.push(...JSON.parse(await file.text()));
+        nonJsonRaw.push(...JSON.parse(await file.text()));
       }
     }
+
+    // Direct JSON files: one shared source
+    if (nonJsonRaw.length > 0) {
+      const accountLabel = 'Account ' + autoN++;
+      sources.push({ raw: nonJsonRaw, accountLabel, filename: null });
+    }
+
+    // ── Pass 2: if multiple distinct accounts, show naming dialog ─────────────
+    const distinctAccounts = new Set(sources.map(s => s.accountLabel));
+    if (distinctAccounts.size > 1) {
+      await new Promise(resolve => {
+        const overlay = document.getElementById('naming-overlay');
+        const rowsEl  = document.getElementById('naming-rows');
+        rowsEl.innerHTML = '';
+
+        const inputs = sources.map(s => {
+          const row = document.createElement('div');
+          row.className = 'naming-row';
+          const lbl = document.createElement('label');
+          lbl.textContent = s.filename || 'Direct JSON upload';
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.value = s.accountLabel;
+          inp.placeholder = s.accountLabel;
+          row.appendChild(lbl);
+          row.appendChild(inp);
+          rowsEl.appendChild(row);
+          return inp;
+        });
+
+        overlay.classList.add('open');
+
+        const fresh = document.getElementById('naming-confirm-btn').cloneNode(true);
+        document.getElementById('naming-confirm-btn').replaceWith(fresh);
+        fresh.addEventListener('click', () => {
+          inputs.forEach((inp, i) => {
+            sources[i].accountLabel = inp.value.trim() || sources[i].accountLabel;
+          });
+          overlay.classList.remove('open');
+          resolve();
+        });
+      });
+    }
+
+    // ── Pass 3: flatten all sources into a single raw array with _account tag ──
+    // Assign each source its own batchId so upload history shows one entry per zip
+    sources.forEach((s, i) => { s.batchId = batchId + '_' + i; });
+    const taggedRaw = sources.flatMap(s => s.raw.map(c => ({ ...c, _sourceAccount: s.accountLabel, _sourceBatchId: s.batchId })));
+    const raw = taggedRaw;
 
     // Detect re-import of a previously exported file (has our format: date string + messages array, no create_time)
     if (raw.length > 0 && raw[0].date && raw[0].messages && !raw[0].create_time) {
@@ -1789,7 +2051,8 @@ async function parseFiles(files, mode = 'replace') {
         return {
           ...c,
           _key:     c._key || (date.getTime() + '|' + (c.title || '')),
-          _batchId: c._batchId || batchId,
+          _batchId: c._batchId || c._sourceBatchId || batchId,
+          _account: c._account || c._sourceAccount,
           date,
           monthKey:  date.toISOString().slice(0, 7),
           monthLabel: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
@@ -1799,8 +2062,10 @@ async function parseFiles(files, mode = 'replace') {
       });
       const before = allConversations.length;
       allConversations = mergeConversations(allConversations, reimported, mode);
-      const added = allConversations.length - (mode === 'replace' ? 0 : before);
-      await saveBatchMeta(batchId, batchFiles, added);
+      for (const s of sources) {
+        const count = allConversations.filter(c => c._batchId === s.batchId).length;
+        await saveBatchMeta(s.batchId, s.filename ? [s.filename] : [], count, s.accountLabel);
+      }
       buildDashboard();
       return;
     }
@@ -1834,7 +2099,7 @@ async function parseFiles(files, mode = 'replace') {
         const monthKey = date.toISOString().slice(0, 7);
         const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         const title = c.title || '(untitled)';
-        return { _key: date.getTime() + '|' + title, _batchId: batchId,
+        return { _key: date.getTime() + '|' + title, _batchId: c._sourceBatchId || batchId, _account: c._sourceAccount,
           title, date, monthKey, monthLabel, messages,
           userText: messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
           fullText: messages.map(m => m.text).join(' '),
@@ -1852,8 +2117,10 @@ async function parseFiles(files, mode = 'replace') {
       .sort((a, b) => a.date - b.date);
     allConversations.forEach(c => { if (markedKeys.has(c._key)) markedForDownload.add(c); });
 
-    const added = allConversations.length - (mode === 'replace' ? 0 : before);
-    await saveBatchMeta(batchId, batchFiles, added);
+    for (const s of sources) {
+      const count = allConversations.filter(c => c._batchId === s.batchId).length;
+      await saveBatchMeta(s.batchId, s.filename ? [s.filename] : [], count, s.accountLabel);
+    }
     buildDashboard();
   } catch (err) {
     alert('Error reading files: ' + err.message);
@@ -1871,35 +2138,40 @@ function buildDashboard() {
     saveToIndexedDB();
   }
   refreshSaveStatusPill();
+  buildAccountFilterBar();
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const convos = getActiveConversations();
+  if (convos.length === 0) return;
+
+  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   // Populate search topic filter
   const topicFilter = document.getElementById('search-topic-filter');
+  const prevTopic = topicFilter.value;
   topicFilter.innerHTML = '<option value="">All Topics</option>';
-  const topics = [...new Set(allConversations.map(c => c.topic))].sort();
+  const topics = [...new Set(convos.map(c => c.topic))].sort();
   topics.forEach(t => {
     const opt = document.createElement('option');
     opt.value = t;
     opt.textContent = t;
     topicFilter.appendChild(opt);
   });
-  topicFilter.addEventListener('change', () => {
-    const query = document.getElementById('search-input').value.trim();
-    runSearch(query);
-  });
-
-  const total = allConversations.length;
-  const first = allConversations[0].date;
-  const last  = allConversations[allConversations.length - 1].date;
-  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  topicFilter.value = prevTopic; // restore selection if still valid
 
   // Stats
+  const total = convos.length;
+  const first = convos[0].date;
+  const last  = convos[convos.length - 1].date;
   document.getElementById('stat-total').textContent = total.toLocaleString();
   document.getElementById('stat-range').textContent = fmt(first) + ' – ' + fmt(last);
   document.getElementById('header-range').textContent = total.toLocaleString() + ' conversations';
 
   // Peak month
   const monthlyCounts = {};
-  allConversations.forEach(c => {
+  convos.forEach(c => {
     monthlyCounts[c.monthLabel] = (monthlyCounts[c.monthLabel] || 0) + 1;
   });
   const peakLabel = Object.entries(monthlyCounts).sort((a, b) => b[1] - a[1])[0];
@@ -1908,7 +2180,7 @@ function buildDashboard() {
 
   // Top topic
   const topicCounts = {};
-  allConversations.forEach(c => {
+  convos.forEach(c => {
     topicCounts[c.topic] = (topicCounts[c.topic] || 0) + 1;
   });
   const topTopic = Object.entries(topicCounts).sort((a, b) => b[1] - a[1])[0];
@@ -1925,6 +2197,7 @@ function buildDashboard() {
   renderMonthlyChart(monthlyCounts);
   renderTopicBarChart(topicCounts);
   renderTopicGrid(topicCounts);
+  activeTimelineTopics = new Set(); // reset timeline selection on re-render
   renderTimelineControls(topicCounts);
   renderTimeline();
 }
@@ -1973,9 +2246,10 @@ const emojiPointPlugin = {
 };
 
 function monthsSorted(monthlyCounts) {
+  const convos = getActiveConversations();
   return Object.keys(monthlyCounts).sort((a, b) => {
-    const ma = allConversations.find(c => c.monthLabel === a);
-    const mb = allConversations.find(c => c.monthLabel === b);
+    const ma = convos.find(c => c.monthLabel === a);
+    const mb = convos.find(c => c.monthLabel === b);
     return (ma?.date || 0) - (mb?.date || 0);
   });
 }
@@ -2033,7 +2307,7 @@ function renderMonthlyChart(monthlyCounts) {
       onClick(e, elements) {
         if (!elements.length) return;
         const monthLabel = labels[elements[0].index];
-        const convos = allConversations.filter(c => c.monthLabel === monthLabel)
+        const convos = getActiveConversations().filter(c => c.monthLabel === monthLabel)
           .sort((a, b) => a.date - b.date);
         openDrilldown(monthLabel + ' · ' + convos.length + ' conversation' + (convos.length !== 1 ? 's' : ''), convos);
       },
@@ -2072,7 +2346,8 @@ function renderTopicBarChart(topicCounts) {
 }
 
 function renderTimeline() {
-  const months = [...new Set(allConversations.map(c => c.monthKey))].sort();
+  const convos = getActiveConversations();
+  const months = [...new Set(convos.map(c => c.monthKey))].sort();
   const monthLabels = months.map(m => {
     const d = new Date(m + '-02');
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -2083,7 +2358,7 @@ function renderTimeline() {
   const datasets = topics.map((topic, i) => ({
     label: topic,
     data: months.map(m =>
-      allConversations.filter(c => c.monthKey === m && c.topic === topic).length
+      convos.filter(c => c.monthKey === m && c.topic === topic).length
     ),
     borderColor: topicColorMap[topic] || TIMELINE_COLORS[i % TIMELINE_COLORS.length],
     backgroundColor: (topicColorMap[topic] || TIMELINE_COLORS[i % TIMELINE_COLORS.length]) + '25',
@@ -2144,7 +2419,7 @@ function renderTimeline() {
         const dsIdx = elements[0].datasetIndex;
         const monthLabel = monthLabels[idx];
         const topic = datasets[dsIdx].label;
-        const convos = allConversations.filter(c => c.monthLabel === monthLabel && c.topic === topic)
+        const convos = getActiveConversations().filter(c => c.monthLabel === monthLabel && c.topic === topic)
           .sort((a, b) => a.date - b.date);
         if (!convos.length) return;
         openDrilldown(topic + ' · ' + monthLabel + ' · ' + convos.length + ' conversation' + (convos.length !== 1 ? 's' : ''), convos);
@@ -2176,7 +2451,7 @@ function renderTopicGrid(topicCounts) {
 }
 
 function showTopicConversations(topic) {
-  const convos = allConversations.filter(c => c.topic === topic)
+  const convos = getActiveConversations().filter(c => c.topic === topic)
     .sort((a, b) => b.date - a.date);
 
   document.getElementById('topic-grid-card').style.display = 'none';
@@ -2563,7 +2838,7 @@ function runSearch(query) {
   if (!query && !topicFilter) { count.textContent = ''; return; }
 
   const q = query.toLowerCase();
-  const matches = allConversations.filter(c => {
+  const matches = getActiveConversations().filter(c => {
     const topicMatch = !topicFilter || c.topic === topicFilter;
     const textMatch = !query ||
       c.title.toLowerCase().includes(q) ||
@@ -2688,9 +2963,16 @@ dropZone.addEventListener('drop', e => {
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
+  if (allConversations.length > 0 && !document.getElementById('autosave-toggle').checked) {
+    const proceed = confirm('Your conversations are not saved to this browser.\n\nIf you continue, your current data will be cleared from memory. To keep it, enable "Save to browser" in Settings first.\n\nContinue anyway?');
+    if (!proceed) return;
+  }
   allConversations = [];
+  savedData = null;
   activeTimelineTopics.clear();
+  activeAccounts.clear();
   markedForDownload.clear();
+  document.getElementById('account-filter-bar').style.display = 'none';
   updateDownloadsBadge();
   document.getElementById('search-topic-filter').innerHTML = '<option value="">All Topics</option>';
   [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
@@ -2780,6 +3062,37 @@ function refreshSettingsUI() {
         const fileLabel = b.files.length === 1
           ? b.files[0]
           : b.files[0] + ' and ' + (b.files.length - 1) + ' more file' + (b.files.length > 2 ? 's' : '');
+
+        // Account name (editable)
+        const accountRow = document.createElement('div');
+        accountRow.style.cssText = 'display:flex;align-items:center;gap:.4rem;margin-bottom:.15rem';
+        const accountName = document.createElement('span');
+        accountName.className = 'batch-info';
+        accountName.textContent = b.account || fileLabel;
+        const renameBtn = document.createElement('button');
+        renameBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--muted);padding:0;text-decoration:underline;text-underline-offset:2px';
+        renameBtn.textContent = 'rename';
+        renameBtn.addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = b.account || fileLabel;
+          input.style.cssText = 'font-size:.82rem;border:1px solid var(--border);border-radius:4px;padding:2px 6px;width:180px';
+          accountName.replaceWith(input);
+          input.focus();
+          input.select();
+          const save = async () => {
+            const newName = input.value.trim() || (b.account || fileLabel);
+            b.account = newName;
+            await renameBatchAccount(b.id, newName);
+            input.replaceWith(accountName);
+            accountName.textContent = newName;
+          };
+          input.addEventListener('blur', save);
+          input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });
+        });
+        accountRow.appendChild(accountName);
+        accountRow.appendChild(renameBtn);
+
         label.textContent = fileLabel;
         const meta = document.createElement('div');
         meta.className = 'batch-meta';
@@ -2787,6 +3100,7 @@ function refreshSettingsUI() {
           ? 'No new conversations — all duplicates'
           : b.added.toLocaleString() + ' conversation' + (b.added !== 1 ? 's' : '') + ' added';
         meta.textContent = new Date(b.timestamp).toLocaleString() + ' · ' + addedLabel;
+        info.appendChild(accountRow);
         info.appendChild(label);
         info.appendChild(meta);
 
@@ -2883,7 +3197,7 @@ document.getElementById('clear-data-btn').addEventListener('click', async () => 
 
 // ── Batch metadata ────────────────────────────────────────────────────────────
 
-async function saveBatchMeta(batchId, files, added) {
+async function saveBatchMeta(batchId, files, added, account) {
   try {
     const db = await getDB();
     const tx = db.transaction('meta', 'readwrite');
@@ -2891,10 +3205,28 @@ async function saveBatchMeta(batchId, files, added) {
     const req = store.get('batches');
     req.onsuccess = () => {
       const batches = req.result || [];
-      batches.push({ id: batchId, timestamp: batchId, files, added });
+      batches.push({ id: batchId, timestamp: batchId, files, added, account });
       store.put(batches, 'batches');
     };
   } catch (e) { /* non-critical */ }
+}
+
+async function renameBatchAccount(batchId, newName) {
+  // Update conversations in memory
+  allConversations.forEach(c => { if (c._batchId === batchId) c._account = newName; });
+  // Update batch meta
+  try {
+    const db = await getDB();
+    const tx = db.transaction('meta', 'readwrite');
+    const store = tx.objectStore('meta');
+    const req = store.get('batches');
+    req.onsuccess = () => {
+      const batches = (req.result || []).map(b => b.id === batchId ? { ...b, account: newName } : b);
+      store.put(batches, 'batches');
+    };
+  } catch (e) { /* non-critical */ }
+  if (document.getElementById('autosave-toggle').checked) saveToIndexedDB();
+  buildAccountFilterBar();
 }
 
 async function loadBatchMeta() {
@@ -2959,7 +3291,17 @@ function showDefaultDropZone() {
 async function checkForSavedData() {
   try {
     const { conversations, savedAt } = await loadFromIndexedDB();
-    if (!conversations || conversations.length === 0) { showDefaultDropZone(); return; }
+    if (!conversations || conversations.length === 0) {
+      // Prune stale batch history — no conversation data means history entries are misleading
+      try {
+        const db2 = await getDB();
+        const tx2 = db2.transaction('meta', 'readwrite');
+        tx2.objectStore('meta').delete('batches');
+      } catch(e) { /* non-critical */ }
+      showDefaultDropZone();
+      return;
+    }
+    savedData = { conversations, savedAt };
 
     const dz = document.getElementById('drop-zone');
     const saved = new Date(savedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -2972,6 +3314,7 @@ async function checkForSavedData() {
       </p>
     `;
     document.getElementById('load-saved-btn').addEventListener('click', () => {
+      savedData = null;
       allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
       buildDashboard();
     });
@@ -2979,7 +3322,7 @@ async function checkForSavedData() {
       showMergeDialog({
         desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
         onAdd:     () => openFilePicker('merge', conversations),
-        onReplace: () => openFilePicker('replace', null),
+        onReplace: () => { savedData = null; openFilePicker('replace', null); },
         onCancel:  () => {},  // stay on saved-data screen
       });
     });
@@ -3044,7 +3387,7 @@ function getProfileCapBytes() {
 }
 
 function buildProfileOutput(capBytes = Infinity) {
-  const sorted = [...allConversations].sort((a, b) => b.date - a.date);
+  const sorted = [...getActiveConversations()].sort((a, b) => b.date - a.date);
 
   let userMessageCount = 0;
   let wordCount = 0;
@@ -3147,7 +3490,7 @@ function renderProfileTab() {
   // Stats
   const statsRow = document.getElementById('profile-stats-row');
   statsRow.style.display = 'grid';
-  document.getElementById('profile-stat-convos').textContent = allConversations.length.toLocaleString();
+  document.getElementById('profile-stat-convos').textContent = getActiveConversations().length.toLocaleString();
   document.getElementById('profile-stat-messages').textContent = userMessageCount.toLocaleString();
   document.getElementById('profile-stat-words').textContent = wordCount.toLocaleString();
 
