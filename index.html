@@ -14,9 +14,9 @@
       --bg:        #FAFAF8;
       --surface:   #FFFFFF;
       --border:    #E8E4DF;
-      --accent:    #F28F4B;
-      --accent2:   #F5A975;
-      --accent3:   #F9C8A0;
+      --accent:    #C05F3C;
+      --accent2:   #E8956D;
+      --accent3:   #F5C9A0;
       --text:      #2D2D2D;
       --muted:     #777777;
       --radius:    10px;
@@ -490,7 +490,6 @@
     .dl-remove:hover { color: #c00; }
 
     #download-all-btn {
-      margin-top: 1.2rem;
       padding: .6rem 1.4rem;
       background: var(--accent);
       color: #fff;
@@ -1353,12 +1352,14 @@
         <h2>Ready to Download</h2>
         <div style="display:flex;gap:.5rem;flex-shrink:0">
           <button id="download-all-btn" disabled>⬇ Download All as ZIP</button>
-          <button id="unpin-all-btn" class="settings-btn" disabled style="font-size:.78rem;padding:.6rem 1rem">Unpin All</button>
+          <button id="unpin-all-btn" class="settings-btn" disabled style="font-size:.9rem;padding:.6rem 1.4rem">Unpin All</button>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:.4rem">
         <select id="download-sort" style="font-size:.78rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer">
           <option value="pinned">Pinned order</option>
+          <option value="newest">Created date (newest)</option>
+          <option value="oldest">Created date (oldest)</option>
           <option value="largest">Largest first</option>
           <option value="smallest">Smallest first</option>
         </select>
@@ -1838,11 +1839,16 @@ function maybeParseFiles(files) {
   if (allConversations.length === 0 && savedData) {
     // Saved data exists but hasn't been loaded yet — treat it as existing data
     const conversations = savedData.conversations;
+    const pinnedKeys = savedData.pinnedKeys;
     showMergeDialog({
       desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
       onAdd: () => {
         savedData = null;
         allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
+        markedForDownload.clear();
+        allConversations.forEach(c => {
+          if (pinnedKeys.includes(deriveKey(c))) markedForDownload.add(c);
+        });
         parseFiles(files, 'merge');
       },
       onReplace: () => { savedData = null; parseFiles(files, 'replace'); },
@@ -1856,19 +1862,31 @@ function maybeParseFiles(files) {
   showMergeDialog({
     desc: `You have ${allConversations.length.toLocaleString()} conversations loaded. What would you like to do with the new files?`,
     onAdd:     () => parseFiles(files, 'merge'),
-    onReplace: () => parseFiles(files, 'replace'),
+    onReplace: () => { 
+      savedData = null; 
+      markedForDownload.clear(); 
+      parseFiles(files, 'replace'); 
+    },
   });
 }
 
-function openFilePicker(mode, preloadConversations) {
+function openFilePicker(mode, preloadConversations, pinnedKeys = []) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.zip,.json';
   input.multiple = true;
   input.addEventListener('change', () => {
     if (!input.files.length) return;
+    if (mode === 'replace') {
+      markedForDownload.clear();
+      savedData = null;
+    }
     if (preloadConversations) {
       allConversations = preloadConversations.map(c => ({ ...c, date: new Date(c.date) }));
+      markedForDownload.clear();
+      allConversations.forEach(c => {
+        if (pinnedKeys.includes(deriveKey(c))) markedForDownload.add(c);
+      });
     }
     parseFiles(input.files, mode);
   });
@@ -1983,6 +2001,9 @@ async function parseFiles(files, mode = 'replace') {
 
     const nonJsonRaw = []; // direct JSON files share one unnamed source
 
+    const jsonFilesRaw = [];
+    const jsonFilenames = [];
+
     for (const file of files) {
       if (file.name.endsWith('.zip')) {
         const zip = await JSZip.loadAsync(file);
@@ -2005,16 +2026,18 @@ async function parseFiles(files, mode = 'replace') {
           const text = await entry.async('text');
           raw.push(...JSON.parse(text));
         }
-        sources.push({ raw, accountLabel, filename: file.name });
+        sources.push({ raw, accountLabel, filenames: [file.name] });
       } else {
-        nonJsonRaw.push(...JSON.parse(await file.text()));
+        const raw = JSON.parse(await file.text());
+        const data = Array.isArray(raw) ? raw : [raw];
+        jsonFilesRaw.push(...data);
+        jsonFilenames.push(file.name);
       }
     }
 
-    // Direct JSON files: one shared source
-    if (nonJsonRaw.length > 0) {
+    if (jsonFilesRaw.length > 0) {
       const accountLabel = 'Account ' + autoN++;
-      sources.push({ raw: nonJsonRaw, accountLabel, filename: null });
+      sources.push({ raw: jsonFilesRaw, accountLabel, filenames: jsonFilenames });
     }
 
     // ── Pass 2: if multiple distinct accounts, show naming dialog ─────────────
@@ -2029,7 +2052,7 @@ async function parseFiles(files, mode = 'replace') {
           const row = document.createElement('div');
           row.className = 'naming-row';
           const lbl = document.createElement('label');
-          lbl.textContent = s.filename || 'Direct JSON upload';
+          lbl.textContent = s.filenames.join(', ');
           const inp = document.createElement('input');
           inp.type = 'text';
           inp.value = s.accountLabel;
@@ -2077,10 +2100,15 @@ async function parseFiles(files, mode = 'replace') {
         };
       });
       const before = allConversations.length;
+      const markedKeys = mode === 'replace' ? new Set() : new Set([...markedForDownload].map(deriveKey));
       allConversations = mergeConversations(allConversations, reimported, mode);
+      markedForDownload.clear();
+      if (mode !== 'replace') {
+        allConversations.forEach(c => { if (markedKeys.has(deriveKey(c))) markedForDownload.add(c); });
+      }
       for (const s of sources) {
         const count = allConversations.filter(c => c._batchId === s.batchId).length;
-        await saveBatchMeta(s.batchId, s.filename ? [s.filename] : [], count, s.accountLabel);
+        await saveBatchMeta(s.batchId, s.filenames, count, s.accountLabel);
       }
       buildDashboard();
       return;
@@ -2126,16 +2154,18 @@ async function parseFiles(files, mode = 'replace') {
     const before = allConversations.length;
     const combined = mergeConversations(allConversations, parsed, mode);
     buildIDF(combined);
-    const markedKeys = new Set([...markedForDownload].map(c => c._key));
+    const markedKeys = mode === 'replace' ? new Set() : new Set([...markedForDownload].map(deriveKey));
     markedForDownload.clear();
     allConversations = combined
       .map(c => ({ ...c, topic: classifyConversation(c) }))
       .sort((a, b) => a.date - b.date);
-    allConversations.forEach(c => { if (markedKeys.has(c._key)) markedForDownload.add(c); });
+    if (mode !== 'replace') {
+      allConversations.forEach(c => { if (markedKeys.has(deriveKey(c))) markedForDownload.add(c); });
+    }
 
     for (const s of sources) {
       const count = allConversations.filter(c => c._batchId === s.batchId).length;
-      await saveBatchMeta(s.batchId, s.filename ? [s.filename] : [], count, s.accountLabel);
+      await saveBatchMeta(s.batchId, s.filenames, count, s.accountLabel);
     }
     buildDashboard();
   } catch (err) {
@@ -2672,6 +2702,8 @@ function renderDownloadsTab() {
       const sizeB = b.messages.reduce((s, m) => s + m.text.length, 0);
       return sort === 'largest' ? sizeB - sizeA : sizeA - sizeB;
     }
+    if (sort === 'newest') return b.date - a.date;
+    if (sort === 'oldest') return a.date - b.date;
     return 0;
   });
 
@@ -3021,22 +3053,8 @@ dropZone.addEventListener('drop', e => {
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
-  if (allConversations.length > 0 && !document.getElementById('autosave-toggle').checked) {
-    const proceed = confirm('Your conversations are not saved to this browser.\n\nIf you continue, your current data will be cleared from memory. To keep it, enable "Save to browser" in Settings first.\n\nContinue anyway?');
-    if (!proceed) return;
-  }
-  allConversations = [];
-  savedData = null;
-  activeTimelineTopics.clear();
-  activeAccounts.clear();
-  markedForDownload.clear();
-  document.getElementById('account-filter-bar').style.display = 'none';
-  updateDownloadsBadge();
-  document.getElementById('search-topic-filter').innerHTML = '<option value="">All Topics</option>';
-  [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
-  document.getElementById('search-input').value = '';
   checkForSavedData();
 });
 
@@ -3117,9 +3135,13 @@ function refreshSettingsUI() {
         const info = document.createElement('div');
         const label = document.createElement('div');
         label.className = 'batch-info';
-        const fileLabel = b.files.length === 1
-          ? b.files[0]
-          : b.files[0] + ' and ' + (b.files.length - 1) + ' more file' + (b.files.length > 2 ? 's' : '');
+        
+        let fileLabel = 'Uploaded files';
+        if (b.files && b.files.length > 0) {
+          fileLabel = b.files.length === 1
+            ? b.files[0]
+            : b.files[0] + ' and ' + (b.files.length - 1) + ' more file' + (b.files.length > 2 ? 's' : '');
+        }
 
         // Account name (editable)
         const accountRow = document.createElement('div');
@@ -3157,7 +3179,9 @@ function refreshSettingsUI() {
         const addedLabel = b.added === 0
           ? 'No new conversations — all duplicates'
           : b.added.toLocaleString() + ' conversation' + (b.added !== 1 ? 's' : '') + ' added';
-        meta.textContent = new Date(b.timestamp).toLocaleString() + ' · ' + addedLabel;
+        
+        const timestamp = typeof b.timestamp === 'string' ? parseFloat(b.timestamp) : b.timestamp;
+        meta.textContent = new Date(timestamp).toLocaleString() + ' · ' + addedLabel;
         info.appendChild(accountRow);
         info.appendChild(label);
         info.appendChild(meta);
@@ -3167,7 +3191,8 @@ function refreshSettingsUI() {
         removeBtn.style.cssText = 'font-size:.75rem;padding:.2rem .55rem;flex-shrink:0';
         removeBtn.textContent = 'Remove';
         removeBtn.addEventListener('click', async () => {
-          if (!confirm(`Remove all conversations from this upload (${b.files.join(', ')})?`)) return;
+          const filenames = b.files && b.files.length > 0 ? b.files.join(', ') : 'this upload';
+          if (!confirm(`Remove all conversations from ${filenames}?`)) return;
           await removeBatch(b.id);
         });
 
@@ -3205,7 +3230,10 @@ async function saveToIndexedDB() {
   allConversations.forEach((c, i) => {
     store.put({ ...c, _idx: i, date: c.date.toISOString() });
   });
-  tx.objectStore('meta').put(Date.now(), 'savedAt');
+  const meta = tx.objectStore('meta');
+  meta.put(Date.now(), 'savedAt');
+  const pinnedKeys = [...markedForDownload].map(c => deriveKey(c));
+  meta.put(pinnedKeys, 'pinnedKeys');
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => { resolve(); refreshSettingsUI(); };
     tx.onerror = e => reject(e.target.error);
@@ -3217,10 +3245,18 @@ async function loadFromIndexedDB() {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(['conversations', 'meta'], 'readonly');
     const req = tx.objectStore('conversations').getAll();
-    const metaReq = tx.objectStore('meta').get('savedAt');
+    const metaStore = tx.objectStore('meta');
+    const savedAtReq = metaStore.get('savedAt');
+    const pinnedKeysReq = metaStore.get('pinnedKeys');
     req.onsuccess = () => {
-      metaReq.onsuccess = () => {
-        resolve({ conversations: req.result, savedAt: metaReq.result });
+      savedAtReq.onsuccess = () => {
+        pinnedKeysReq.onsuccess = () => {
+          resolve({
+            conversations: req.result,
+            savedAt: savedAtReq.result,
+            pinnedKeys: pinnedKeysReq.result || []
+          });
+        };
       };
     };
     req.onerror = e => reject(e.target.error);
@@ -3263,7 +3299,8 @@ async function saveBatchMeta(batchId, files, added, account) {
     const req = store.get('batches');
     req.onsuccess = () => {
       const batches = req.result || [];
-      batches.push({ id: batchId, timestamp: batchId, files, added, account });
+      const timestamp = typeof batchId === 'string' ? parseFloat(batchId) : batchId;
+      batches.push({ id: batchId, timestamp, files, added, account });
       store.put(batches, 'batches');
     };
   } catch (e) { /* non-critical */ }
@@ -3348,7 +3385,7 @@ function showDefaultDropZone() {
 
 async function checkForSavedData() {
   try {
-    const { conversations, savedAt } = await loadFromIndexedDB();
+    const { conversations, savedAt, pinnedKeys } = await loadFromIndexedDB();
     if (!conversations || conversations.length === 0) {
       // Prune stale batch history — no conversation data means history entries are misleading
       try {
@@ -3359,7 +3396,7 @@ async function checkForSavedData() {
       showDefaultDropZone();
       return;
     }
-    savedData = { conversations, savedAt };
+    savedData = { conversations, savedAt, pinnedKeys };
 
     const dz = document.getElementById('drop-zone');
     const saved = new Date(savedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -3374,12 +3411,16 @@ async function checkForSavedData() {
     document.getElementById('load-saved-btn').addEventListener('click', () => {
       savedData = null;
       allConversations = conversations.map(c => ({ ...c, date: new Date(c.date) }));
+      markedForDownload.clear();
+      allConversations.forEach(c => {
+        if (pinnedKeys.includes(deriveKey(c))) markedForDownload.add(c);
+      });
       buildDashboard();
     });
     document.getElementById('upload-new-btn').addEventListener('click', () => {
       showMergeDialog({
         desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
-        onAdd:     () => openFilePicker('merge', conversations),
+        onAdd:     () => openFilePicker('merge', conversations, pinnedKeys),
         onReplace: () => { savedData = null; openFilePicker('replace', null); },
         onCancel:  () => {},  // stay on saved-data screen
       });
