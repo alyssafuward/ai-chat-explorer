@@ -1,8 +1,8 @@
-# ChatGPT Explorer
+# AI Chat Explorer
 
 **Created by [Alyssa Fu Ward](https://substack.com/@alyssafuward)**
 
-A browser-based tool for exploring your ChatGPT conversation history. Upload your exported data and instantly get a searchable, visual breakdown of everything you've talked about — organized by topic, mapped across time, and fully readable.
+A browser-based tool for exploring your AI conversation history — ChatGPT, Claude, and more. Upload your exported data and instantly get a searchable, visual breakdown of everything you've talked about — organized by topic, mapped across time, and fully readable.
 
 **Your data never leaves your browser.** All processing happens locally. Nothing is sent to any server.
 
@@ -10,12 +10,12 @@ A browser-based tool for exploring your ChatGPT conversation history. Upload you
 
 ## Features
 
-- **Overview** — monthly conversation volume (click any bar to browse that month) and topic breakdown charts
+- **Overview** — monthly conversation volume (click any bar to browse that month) and topic breakdown charts; stacked by AI source when multiple are loaded
 - **Topics** — auto-classified conversations grouped into themes; click any topic to browse conversations, click any conversation to read the full thread
 - **Search** — full-text search across titles and message content with highlighted snippets
 - **Timeline** — line chart showing how your topics shifted month by month; click any data point to see the conversations behind it
-- **ChatGPT Me** — extract your side of every conversation (your messages only) into a file you can hand to any AI to build a personal profile or mine your history
-- **Marked for Download** — pin conversations and download them individually or as a ZIP
+- **AI Chat Me** — extract your side of every conversation (your messages only) into a file you can hand to any AI to build a personal profile or mine your history
+- **Pinned for Download** — pin conversations and download them individually or as a ZIP
 
 Your data is saved in the browser between sessions using IndexedDB. You can upload multiple exports and merge them — duplicates are automatically deduplicated.
 
@@ -23,23 +23,23 @@ Your data is saved in the browser between sessions using IndexedDB. You can uplo
 
 ## How to Use
 
-### 1. Export your ChatGPT data
+### 1. Export your data
 
-In ChatGPT: **Settings → Data Controls → Export Data**
+**ChatGPT:** Settings → Data Controls → Export Data → you'll receive a `.zip` file by email.
 
-You'll receive an email with a `.zip` file.
+**Claude:** Settings → Privacy → Export Data → you'll receive a `conversations.json` file.
 
 ### 2. Open the app
 
 Open `index.html` directly in any modern browser — no installation, no server needed.
 
-Or visit the hosted version at: https://alyssafuward.github.io/chatgpt-explorer/
+Or visit the hosted version at: https://alyssafuward.github.io/ai-chat-explorer/
 
 ### 3. Upload your files
 
-Drag and drop your `.zip` export directly onto the upload area — no extraction needed. The app will find and process all `conversations.json` files inside automatically.
+Drag and drop your `.zip` or `.json` export onto the upload area. The app will find and process all conversation files automatically.
 
-You can also upload extracted JSON files individually: either a single `conversations.json` or multiple numbered files (`conversations-000.json`, `conversations-001.json`, etc.). Multiple files are supported.
+You can upload ChatGPT and Claude exports together — they'll be parsed correctly and labeled separately with source filter chips and colored badges.
 
 If you already have data saved in the browser, you'll be asked whether to merge the new files in or replace everything.
 
@@ -60,8 +60,8 @@ No build step, no dependencies to install, no server required.
 ## Cloning & Developing
 
 ```bash
-git clone https://github.com/alyssafuward/chatgpt-explorer.git
-cd chatgpt-explorer
+git clone https://github.com/alyssafuward/ai-chat-explorer.git
+cd ai-chat-explorer
 open index.html
 ```
 
@@ -125,9 +125,9 @@ The app does not include a CSP header or meta tag. A CSP would provide an additi
 
 #### ⚠️ No JSON schema validation
 
-The app performs basic structural checks on uploaded JSON (`c && c.create_time`) but does not validate the full schema of the ChatGPT export format. A malformed or unexpected JSON structure will fail silently — conversations with missing fields are skipped rather than crashing the app.
+The app performs basic structural checks on uploaded JSON but does not validate the full schema of the export format. A malformed or unexpected JSON structure will fail silently — conversations with missing fields are skipped rather than crashing the app.
 
-**Risk level:** Low. The app is designed for a specific, well-known export format. Silent failure on unexpected input is preferable to a confusing crash.
+**Risk level:** Low. The app is designed for well-known export formats. Silent failure on unexpected input is preferable to a confusing crash.
 
 ### Threat model summary
 
@@ -144,7 +144,7 @@ The app performs basic structural checks on uploaded JSON (`c && c.create_time`)
 
 This review covers the `index.html` file as of v2 (2026-03-20). It does not cover:
 - Forks or modifications made after cloning
-- The security of ChatGPT's export format itself
+- The security of ChatGPT's or Claude's export format itself
 - Browser-level vulnerabilities or extensions
 - The hosting environment (GitHub Pages, Netlify, etc.)
 
