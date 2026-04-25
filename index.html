@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ChatGPT Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
           integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g"
           crossorigin="anonymous"></script>
@@ -11,20 +14,20 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #FAFAF8;
+      --bg:        #F2F8FD;
       --surface:   #FFFFFF;
-      --border:    #E8E4DF;
-      --accent:    #C05F3C;
-      --accent2:   #E8956D;
-      --accent3:   #F5C9A0;
-      --text:      #2D2D2D;
-      --muted:     #777777;
+      --border:    #D8ECF8;
+      --accent:    #1F6FA8;
+      --accent2:   #C8DEF0;
+      --accent3:   #EBF4FB;
+      --text:      #1A1A1A;
+      --muted:     #666666;
       --radius:    10px;
-      --shadow:    0 2px 12px rgba(0,0,0,0.07);
+      --shadow:    0 2px 12px rgba(31,111,168,0.08);
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -44,7 +47,8 @@
 
     #upload-screen h1 {
       font-size: 2rem;
-      font-weight: 700;
+      font-weight: 400;
+      font-family: "DM Serif Display", serif;
       margin-bottom: .5rem;
       color: var(--text);
     }
@@ -82,7 +86,7 @@
     }
 
     #drop-zone:hover, #drop-zone.drag-over {
-      background: #FEF4EE;
+      background: #EBF4FB;
       border-color: var(--accent);
     }
 
@@ -122,7 +126,7 @@
       z-index: 100;
     }
 
-    header h1 { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+    header h1 { font-size: 1.1rem; font-weight: 400; font-family: "DM Serif Display", serif; color: var(--accent); }
     header span { font-size: .85rem; color: var(--muted); }
 
     #header-right { display: flex; align-items: center; gap: .6rem; }
@@ -398,7 +402,7 @@
     }
 
     .topic-chip {
-      background: #FEF4EE;
+      background: #EBF4FB;
       border: 1px solid var(--accent3);
       border-radius: 8px;
       padding: .7rem 1rem;
@@ -428,6 +432,9 @@
     .convo-title { font-size: .9rem; color: var(--text); flex: 1; }
     .convo-date { font-size: .78rem; color: var(--muted); white-space: nowrap; }
     .convo-account-badge { font-size: .7rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: .1rem .5rem; white-space: nowrap; flex-shrink: 0; }
+    .source-badge { font-size: .68rem; font-weight: 600; border-radius: 999px; padding: .1rem .5rem; white-space: nowrap; flex-shrink: 0; }
+    .source-badge.claude { color: #a05010; background: #FEF0E0; border: 1px solid #F08030; }
+    .source-badge.chatgpt { color: #2D6858; background: #E0F4EE; border: 1px solid #6BBAA0; }
 
     .mark-btn {
       background: none;
@@ -563,7 +570,8 @@
 
     .highlight { background: #FDEBC0; border-radius: 2px; padding: 0 2px; }
 
-    #search-count { font-size: .85rem; color: var(--muted); margin-bottom: 1rem; }
+    #search-count-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    #search-count { font-size: .85rem; color: var(--muted); }
 
     /* ── Timeline select ───────────────────────────── */
 
@@ -580,9 +588,29 @@
       transition: all .15s;
     }
 
-    .tl-chip.active { border-color: var(--accent); color: var(--accent); background: #FEF4EE; font-weight: 600; }
+    .tl-chip.active { border-color: var(--accent); color: var(--accent); background: #EBF4FB; font-weight: 600; }
 
-    /* ── Account filter bar ────────────────────────── */
+    /* ── Source + Account filter bars ─────────────── */
+
+    #source-filter-bar {
+      display: none;
+      align-items: center;
+      gap: .4rem;
+      flex-wrap: wrap;
+      padding: .6rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #source-filter-label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-right: .25rem;
+      white-space: nowrap;
+    }
 
     #account-filter-bar {
       display: none;
@@ -616,7 +644,7 @@
     }
 
     .acct-chip:hover { border-color: var(--accent); color: var(--text); }
-    .acct-chip.active { border-color: var(--accent); color: var(--accent); background: #FEF4EE; font-weight: 600; }
+    .acct-chip.active { border-color: var(--accent); color: var(--accent); background: #EBF4FB; font-weight: 600; }
 
     /* ── Claude Profile tab ────────────────────────── */
 
@@ -926,13 +954,17 @@
 
     #naming-rows { display: flex; flex-direction: column; gap: .75rem; }
 
+    #naming-select-all-row { display: flex; align-items: center; gap: .5rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); font-size: .82rem; color: var(--muted); cursor: pointer; }
+
     .naming-row {
       display: flex;
       flex-direction: column;
       gap: .25rem;
     }
 
-    .naming-row label { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .naming-row-header { display: flex; align-items: center; gap: .5rem; }
+    .naming-row-header input[type="checkbox"] { cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+    .naming-row label { font-size: .82rem; color: var(--muted); cursor: pointer; }
 
     .naming-row input {
       padding: .55rem .75rem;
@@ -1159,7 +1191,7 @@
   <div id="drop-zone">
     <div class="icon">💬</div>
     <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
-    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
+    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files. Multiple <strong>.zip</strong> files are treated as separate accounts — multiple <strong>.json</strong> files are treated as one account. You can rename accounts later in Settings.</p>
     <input type="file" id="file-input" accept=".zip,.json" multiple />
   </div>
 
@@ -1180,7 +1212,7 @@
     <span id="header-range"></span>
     <div id="header-right">
       <span id="save-status-pill"></span>
-      <button id="reset-btn">← Add / manage files</button>
+      <button id="reset-btn">Add / manage files</button>
       <button id="settings-btn" title="Settings">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1274,6 +1306,9 @@
     </div>
   </div>
 
+  <div id="source-filter-bar">
+    <span id="source-filter-label">Source</span>
+  </div>
   <div id="account-filter-bar">
     <span id="account-filter-label">Account</span>
   </div>
@@ -1336,7 +1371,10 @@
         <option value="">All Topics</option>
       </select>
     </div>
-    <div id="search-count"></div>
+    <div id="search-count-row">
+      <div id="search-count"></div>
+      <button id="search-pin-all-btn" class="settings-btn" style="font-size:.78rem;padding:.25rem .7rem;display:none">Pin All</button>
+    </div>
     <div id="search-results"></div>
   </div>
 
@@ -1488,7 +1526,7 @@
 <div id="naming-overlay">
   <div id="naming-dialog">
     <h3>Name your accounts</h3>
-    <p>We found multiple accounts in your upload. Confirm or edit the names below — you can always rename them later in Settings.</p>
+    <p>Multiple accounts detected. Check the ones you want to group under one name — typing in any checked row updates all of them. Uncheck to give a row its own name.</p>
     <div id="naming-rows"></div>
     <button id="naming-confirm-btn">Continue</button>
   </div>
@@ -1851,7 +1889,7 @@ function maybeParseFiles(files) {
         });
         parseFiles(files, 'merge');
       },
-      onReplace: () => { savedData = null; parseFiles(files, 'replace'); },
+      onReplace: () => { savedData = null; clearIndexedDB(); parseFiles(files, 'replace'); },
     });
     return;
   }
@@ -1862,10 +1900,11 @@ function maybeParseFiles(files) {
   showMergeDialog({
     desc: `You have ${allConversations.length.toLocaleString()} conversations loaded. What would you like to do with the new files?`,
     onAdd:     () => parseFiles(files, 'merge'),
-    onReplace: () => { 
-      savedData = null; 
-      markedForDownload.clear(); 
-      parseFiles(files, 'replace'); 
+    onReplace: () => {
+      savedData = null;
+      markedForDownload.clear();
+      clearIndexedDB();
+      parseFiles(files, 'replace');
     },
   });
 }
@@ -1899,11 +1938,16 @@ let allConversations = [];
 let monthlyChart, topicBarChart, timelineChart;
 let activeTimelineTopics = new Set();
 let activeAccounts = new Set();
+let activeSourceFilter = new Set();
 let savedData = null; // set by checkForSavedData if saved data exists in IndexedDB
 let topicColorMap = {};
 
 function multipleAccountsLoaded() {
   return document.getElementById('account-filter-bar').style.display !== 'none';
+}
+
+function multipleSourcesLoaded() {
+  return document.getElementById('source-filter-bar').style.display !== 'none';
 }
 
 function makeAccountBadge(account) {
@@ -1914,9 +1958,75 @@ function makeAccountBadge(account) {
   return badge;
 }
 
+function makeSourceBadge(source) {
+  if (!multipleSourcesLoaded()) return null;
+  const badge = document.createElement('span');
+  const s = source || 'chatgpt';
+  badge.className = 'source-badge ' + s;
+  badge.textContent = s === 'claude' ? 'Claude' : 'ChatGPT';
+  return badge;
+}
+
 function getActiveConversations() {
-  if (activeAccounts.size === 0) return allConversations;
-  return allConversations.filter(c => activeAccounts.has(c._account || 'Unknown'));
+  let convos = allConversations;
+  if (activeAccounts.size > 0) convos = convos.filter(c => activeAccounts.has(c._account || 'Unknown'));
+  if (activeSourceFilter.size > 0) convos = convos.filter(c => activeSourceFilter.has(c._source || 'chatgpt'));
+  return convos;
+}
+
+function buildSourceFilterBar() {
+  const bar = document.getElementById('source-filter-bar');
+  const sources = [...new Set(allConversations.map(c => c._source || 'chatgpt'))];
+
+  if (sources.length < 2) {
+    bar.style.display = 'none';
+    activeSourceFilter.clear();
+    return;
+  }
+
+  for (const s of [...activeSourceFilter]) {
+    if (!sources.includes(s)) activeSourceFilter.delete(s);
+  }
+
+  bar.style.display = 'flex';
+
+  const label = document.getElementById('source-filter-label');
+  [...bar.children].forEach(el => { if (el !== label) el.remove(); });
+
+  const isAllMode = () => activeSourceFilter.size === 0;
+
+  const renderChips = () => {
+    [...bar.children].forEach(el => { if (el !== label) el.remove(); });
+
+    const allChip = document.createElement('button');
+    allChip.className = 'acct-chip' + (isAllMode() ? ' active' : '');
+    allChip.textContent = 'All';
+    allChip.addEventListener('click', () => {
+      if (isAllMode()) return;
+      activeSourceFilter.clear();
+      renderChips();
+      renderDashboard();
+    });
+    bar.appendChild(allChip);
+
+    for (const source of sources) {
+      const chip = document.createElement('button');
+      chip.className = 'acct-chip' + (activeSourceFilter.has(source) ? ' active' : '');
+      chip.textContent = source === 'claude' ? 'Claude' : 'ChatGPT';
+      chip.addEventListener('click', () => {
+        if (activeSourceFilter.has(source)) {
+          activeSourceFilter.delete(source);
+        } else {
+          activeSourceFilter.add(source);
+        }
+        renderChips();
+        renderDashboard();
+      });
+      bar.appendChild(chip);
+    }
+  };
+
+  renderChips();
 }
 
 function buildAccountFilterBar() {
@@ -2040,7 +2150,7 @@ async function parseFiles(files, mode = 'replace') {
       sources.push({ raw: jsonFilesRaw, accountLabel, filenames: jsonFilenames });
     }
 
-    // ── Pass 2: if multiple distinct accounts, show naming dialog ─────────────
+    // ── Pass 2: show naming dialog if multiple distinct accounts detected ────────
     const distinctAccounts = new Set(sources.map(s => s.accountLabel));
     if (distinctAccounts.size > 1) {
       await new Promise(resolve => {
@@ -2048,19 +2158,58 @@ async function parseFiles(files, mode = 'replace') {
         const rowsEl  = document.getElementById('naming-rows');
         rowsEl.innerHTML = '';
 
-        const inputs = sources.map(s => {
+        // Select all row
+        const selectAllRow = document.createElement('div');
+        selectAllRow.id = 'naming-select-all-row';
+        const selectAllCb = document.createElement('input');
+        selectAllCb.type = 'checkbox';
+        selectAllCb.checked = true;
+        const selectAllLbl = document.createElement('span');
+        selectAllLbl.textContent = 'Select all';
+        selectAllRow.appendChild(selectAllCb);
+        selectAllRow.appendChild(selectAllLbl);
+        selectAllRow.addEventListener('click', e => {
+          if (e.target !== selectAllCb) selectAllCb.checked = !selectAllCb.checked;
+          rows.forEach(r => { r.cb.checked = selectAllCb.checked; });
+        });
+        rowsEl.appendChild(selectAllRow);
+
+        // Per-source rows
+        const rows = sources.map(s => {
           const row = document.createElement('div');
           row.className = 'naming-row';
+
+          const header = document.createElement('div');
+          header.className = 'naming-row-header';
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = true;
           const lbl = document.createElement('label');
           lbl.textContent = s.filenames.join(', ');
+          cb.addEventListener('change', () => {
+            const allChecked = rows.every(r => r.cb.checked);
+            const noneChecked = rows.every(r => !r.cb.checked);
+            selectAllCb.checked = allChecked;
+            selectAllCb.indeterminate = !allChecked && !noneChecked;
+          });
+          header.appendChild(cb);
+          header.appendChild(lbl);
+
           const inp = document.createElement('input');
           inp.type = 'text';
           inp.value = s.accountLabel;
           inp.placeholder = s.accountLabel;
-          row.appendChild(lbl);
+          // Typing in a checked row propagates to all other checked rows
+          inp.addEventListener('input', () => {
+            if (cb.checked) {
+              rows.forEach(r => { if (r.cb.checked && r.inp !== inp) r.inp.value = inp.value; });
+            }
+          });
+
+          row.appendChild(header);
           row.appendChild(inp);
           rowsEl.appendChild(row);
-          return inp;
+          return { cb, inp, source: s };
         });
 
         overlay.classList.add('open');
@@ -2068,8 +2217,8 @@ async function parseFiles(files, mode = 'replace') {
         const fresh = document.getElementById('naming-confirm-btn').cloneNode(true);
         document.getElementById('naming-confirm-btn').replaceWith(fresh);
         fresh.addEventListener('click', () => {
-          inputs.forEach((inp, i) => {
-            sources[i].accountLabel = inp.value.trim() || sources[i].accountLabel;
+          rows.forEach(({ inp, source }) => {
+            source.accountLabel = inp.value.trim() || source.accountLabel;
           });
           overlay.classList.remove('open');
           resolve();
@@ -2114,7 +2263,7 @@ async function parseFiles(files, mode = 'replace') {
       return;
     }
 
-    // Pass 1: parse structure
+    // Pass 1a: parse ChatGPT structure (mapping tree + create_time)
     const parsed = raw
       .filter(c => c && c.create_time)
       .map(c => {
@@ -2144,7 +2293,26 @@ async function parseFiles(files, mode = 'replace') {
         const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         const title = c.title || '(untitled)';
         return { _key: date.getTime() + '|' + title, _batchId: c._sourceBatchId || batchId, _account: c._sourceAccount,
-          title, date, monthKey, monthLabel, messages,
+          _source: 'chatgpt', title, date, monthKey, monthLabel, messages,
+          userText: messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
+          fullText: messages.map(m => m.text).join(' '),
+        };
+      });
+
+    // Pass 1b: parse Claude structure (uuid + chat_messages + created_at)
+    const claudeParsed = raw
+      .filter(c => c && c.uuid && Array.isArray(c.chat_messages) && c.created_at)
+      .map(c => {
+        const messages = c.chat_messages
+          .filter(m => m.sender === 'human' || m.sender === 'assistant')
+          .map(m => ({ role: m.sender === 'human' ? 'user' : 'assistant', text: (m.text || '').trim() }))
+          .filter(m => m.text);
+        const date = new Date(c.created_at);
+        const monthKey = date.toISOString().slice(0, 7);
+        const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        const title = c.name || '(untitled)';
+        return { _key: date.getTime() + '|' + title, _batchId: c._sourceBatchId || batchId, _account: c._sourceAccount,
+          _source: 'claude', title, date, monthKey, monthLabel, messages,
           userText: messages.filter(m => m.role === 'user').map(m => m.text).join(' '),
           fullText: messages.map(m => m.text).join(' '),
         };
@@ -2152,7 +2320,7 @@ async function parseFiles(files, mode = 'replace') {
 
     // Pass 2: merge/replace, then classify
     const before = allConversations.length;
-    const combined = mergeConversations(allConversations, parsed, mode);
+    const combined = mergeConversations(allConversations, [...parsed, ...claudeParsed], mode);
     buildIDF(combined);
     const markedKeys = mode === 'replace' ? new Set() : new Set([...markedForDownload].map(deriveKey));
     markedForDownload.clear();
@@ -2184,6 +2352,7 @@ function buildDashboard() {
     saveToIndexedDB();
   }
   refreshSaveStatusPill();
+  buildSourceFilterBar();
   buildAccountFilterBar();
   renderDashboard();
 }
@@ -2217,8 +2386,12 @@ function renderDashboard() {
 
   // Peak month
   const monthlyCounts = {};
+  const monthlyBySource = {};
   convos.forEach(c => {
     monthlyCounts[c.monthLabel] = (monthlyCounts[c.monthLabel] || 0) + 1;
+    const src = c._source || 'chatgpt';
+    if (!monthlyBySource[src]) monthlyBySource[src] = {};
+    monthlyBySource[src][c.monthLabel] = (monthlyBySource[src][c.monthLabel] || 0) + 1;
   });
   const peakLabel = Object.entries(monthlyCounts).sort((a, b) => b[1] - a[1])[0];
   document.getElementById('stat-peak').textContent = peakLabel[0];
@@ -2240,7 +2413,7 @@ function renderDashboard() {
       topicColorMap[topic] = TIMELINE_COLORS[i % TIMELINE_COLORS.length];
     });
 
-  renderMonthlyChart(monthlyCounts);
+  renderMonthlyChart(monthlyCounts, monthlyBySource);
   renderTopicBarChart(topicCounts);
   renderTopicGrid(topicCounts);
   activeTimelineTopics = new Set(); // reset timeline selection on re-render
@@ -2250,22 +2423,22 @@ function renderDashboard() {
 
 // ── Charts ───────────────────────────────────────────────────────────────────
 
-const CHART_COLORS = ['#C05F3C','#E8956D','#F5C9A0','#A0402A','#7A2E10','#D4785A','#F2B892','#8B3A26','#EAA07C','#BB5530'];
+const CHART_COLORS = ['#6BBAA0','#E8C060','#CC8090','#B0A0D0','#5878A0','#7AAC58','#F08030','#6890B8','#D4A870','#9AC0A8'];
 
-// High-contrast palette reserved for the timeline
+// Illustration-derived palette — soft, hand-drawn tones from Alyssa's artwork
 const TIMELINE_COLORS = [
-  '#E63946', // red
-  '#2A9D8F', // teal
-  '#457B9D', // steel blue
-  '#F4A261', // orange
-  '#6A4C93', // purple
-  '#8AC926', // lime
-  '#FFBE0B', // yellow
-  '#3A86FF', // bright blue
-  '#FB5607', // vermillion
-  '#06D6A0', // mint
-  '#FF006E', // pink
-  '#8338EC', // violet
+  '#CC8090', // dusty rose
+  '#6BBAA0', // muted teal
+  '#E8C060', // warm yellow
+  '#B0A0D0', // soft lavender
+  '#5878A0', // steely blue
+  '#7AAC58', // sage green
+  '#F08030', // warm orange (the character)
+  '#6890B8', // medium sky blue
+  '#D4A870', // golden amber
+  '#9AC0A8', // pale mint
+  '#C8A0C0', // soft mauve
+  '#88A8C8', // periwinkle
 ];
 
 // Plugin: draw the topic emoji at each non-zero data point
@@ -2300,52 +2473,86 @@ function monthsSorted(monthlyCounts) {
   });
 }
 
-function renderMonthlyChart(monthlyCounts) {
+function renderMonthlyChart(monthlyCounts, monthlyBySource) {
   const labels = monthsSorted(monthlyCounts);
-  const data   = labels.map(l => monthlyCounts[l]);
-  const max    = Math.max(...data);
+  const SOURCE_ORDER = ['chatgpt', 'claude'];
+  const sources = SOURCE_ORDER.filter(s => monthlyBySource && monthlyBySource[s]);
+  const isMultiSource = sources.length > 1;
 
   const barLabelPlugin = {
     id: 'barLabels',
     afterDatasetsDraw(chart) {
-      const { ctx, data: d, scales: { x, y } } = chart;
+      const { ctx, data: d } = chart;
       ctx.save();
       ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
-      d.datasets[0].data.forEach((val, i) => {
-        if (!val) return;
-        const bar = chart.getDatasetMeta(0).data[i];
+      const numBars = d.datasets[0]?.data.length || 0;
+      for (let i = 0; i < numBars; i++) {
+        const total = d.datasets.reduce((s, ds) => s + (ds.data[i] || 0), 0);
+        if (!total) continue;
+        let minY = Infinity;
+        for (let di = 0; di < d.datasets.length; di++) {
+          const meta = chart.getDatasetMeta(di);
+          if (!meta.hidden && d.datasets[di].data[i]) minY = Math.min(minY, meta.data[i].y);
+        }
+        if (minY === Infinity) continue;
         ctx.fillStyle = '#888';
-        ctx.fillText(val, bar.x, bar.y - 4);
-      });
+        ctx.fillText(total, chart.getDatasetMeta(0).data[i].x, minY - 4);
+      }
       ctx.restore();
     }
   };
 
+  const SOURCE_STYLES = {
+    chatgpt: { bg: '#6BBAA0', label: 'ChatGPT' },
+    claude:  { bg: '#F08030', label: 'Claude' },
+  };
+
+  let datasets;
+  if (isMultiSource) {
+    datasets = sources.map(src => ({
+      label: SOURCE_STYLES[src].label,
+      data: labels.map(l => (monthlyBySource[src] || {})[l] || 0),
+      backgroundColor: SOURCE_STYLES[src].bg,
+      borderRadius: 0,
+      borderSkipped: false,
+      stack: 'stack',
+    }));
+  } else {
+    const data = labels.map(l => monthlyCounts[l]);
+    const max = Math.max(...data);
+    datasets = [{
+      data,
+      backgroundColor: data.map(v => v === max ? '#6BBAA0' : v >= max * 0.75 ? '#88C8B4' : '#AAD8C8'),
+      borderRadius: 4,
+      borderSkipped: false,
+    }];
+  }
+
   if (monthlyChart) monthlyChart.destroy();
   monthlyChart = new Chart(document.getElementById('monthly-chart'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: data.map(v => v === max ? '#C05F3C' : v >= max * 0.75 ? '#D4785A' : '#E8956D'),
-        borderRadius: 4,
-        borderSkipped: false,
-      }]
-    },
+    data: { labels, datasets },
     plugins: [barLabelPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + ' conversations' } },
+        legend: {
+          display: isMultiSource,
+          position: 'top',
+          labels: { boxWidth: 12, font: { size: 11 }, color: '#555' },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.parsed.y + ' conversations' + (isMultiSource ? ' (' + ctx.dataset.label + ')' : ''),
+          },
+        },
       },
       scales: {
-        x: { grid: { display: false }, ticks: { color: '#777' } },
-        y: { grid: { color: '#EEEEEE' }, ticks: { color: '#777' }, beginAtZero: true },
+        x: { grid: { display: false }, ticks: { color: '#777' }, stacked: isMultiSource },
+        y: { grid: { color: '#EEEEEE' }, ticks: { color: '#777' }, beginAtZero: true, stacked: isMultiSource },
       },
       onHover(e, elements) {
         e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
@@ -2538,10 +2745,11 @@ function showTopicConversations(topic) {
     t.textContent = c.title;
     const d = document.createElement('span');
     d.className = 'convo-date';
-    d.textContent = c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const accountPart = multipleAccountsLoaded() ? ' · ' + (c._account || 'Unknown') : '';
+    d.textContent = c.topic + accountPart + ' · ' + c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     item.appendChild(t);
-    const badge = makeAccountBadge(c._account);
-    if (badge) item.appendChild(badge);
+    const sb = makeSourceBadge(c._source);
+    if (sb) item.appendChild(sb);
     item.appendChild(d);
     item.appendChild(makeMarkBtn(c));
     item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
@@ -2585,7 +2793,7 @@ function openConversation(convo) {
 
       const roleLabel = document.createElement('div');
       roleLabel.className = 'msg-role';
-      roleLabel.textContent = msg.role === 'user' ? 'You' : 'ChatGPT';
+      roleLabel.textContent = msg.role === 'user' ? 'You' : (convo._source === 'claude' ? 'Claude' : 'ChatGPT');
 
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
@@ -2858,10 +3066,11 @@ function openDrilldown(title, convos) {
     t.textContent = c.title;
     const d = document.createElement('span');
     d.className = 'convo-date';
-    d.textContent = c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const accountPart = multipleAccountsLoaded() ? ' · ' + (c._account || 'Unknown') : '';
+    d.textContent = c.topic + accountPart + ' · ' + c.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     item.appendChild(t);
-    const badge = makeAccountBadge(c._account);
-    if (badge) item.appendChild(badge);
+    const sb = makeSourceBadge(c._source);
+    if (sb) item.appendChild(sb);
     item.appendChild(d);
     item.appendChild(makeMarkBtn(c));
     item.addEventListener('click', e => { if (!e.target.closest('.mark-btn')) openConversation(c); });
@@ -2921,7 +3130,9 @@ document.getElementById('search-input').addEventListener('input', function () {
 function runSearch(query) {
   const count = document.getElementById('search-count');
   const results = document.getElementById('search-results');
+  const pinAllBtn = document.getElementById('search-pin-all-btn');
   results.innerHTML = '';
+  pinAllBtn.style.display = 'none';
 
   const topicFilter = document.getElementById('search-topic-filter').value;
 
@@ -2949,6 +3160,25 @@ function runSearch(query) {
     return;
   }
 
+  // Pin All / Unpin All for search results
+  const updatePinAllBtn = () => {
+    const allPinned = matches.every(c => markedForDownload.has(c));
+    pinAllBtn.textContent = allPinned ? 'Unpin All' : 'Pin All';
+  };
+  updatePinAllBtn();
+  pinAllBtn.style.display = '';
+  pinAllBtn.onclick = () => {
+    const allPinned = matches.every(c => markedForDownload.has(c));
+    if (allPinned) {
+      matches.forEach(c => markedForDownload.delete(c));
+    } else {
+      matches.forEach(c => markedForDownload.add(c));
+    }
+    matches.forEach(c => updateMarkUI(c));
+    updateDownloadsBadge();
+    updatePinAllBtn();
+  };
+
   for (const c of matches.slice(0, 50)) {
     const item = document.createElement('div');
     item.className = 'result-item';
@@ -2959,7 +3189,7 @@ function runSearch(query) {
 
     const rmeta = document.createElement('div');
     rmeta.className = 'r-meta';
-    rmeta.textContent = c.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + c.topic + (multipleAccountsLoaded() ? ' · ' + (c._account || 'Unknown') : '');
+    rmeta.textContent = c.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + c.topic + (multipleSourcesLoaded() ? ' · ' + (c._source === 'claude' ? 'Claude' : 'ChatGPT') : '') + (multipleAccountsLoaded() ? ' · ' + (c._account || 'Unknown') : '');
 
     item.appendChild(rtitle);
     item.appendChild(rmeta);
@@ -3053,6 +3283,16 @@ dropZone.addEventListener('drop', e => {
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
+  allConversations = [];
+  savedData = null;
+  activeTimelineTopics.clear();
+  activeAccounts.clear();
+  activeSourceFilter.clear();
+  document.getElementById('source-filter-bar').style.display = 'none';
+  document.getElementById('account-filter-bar').style.display = 'none';
+  document.getElementById('search-topic-filter').innerHTML = '<option value="">All Topics</option>';
+  document.getElementById('search-input').value = '';
+  [monthlyChart, topicBarChart, timelineChart].forEach(c => c && c.destroy());
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
   checkForSavedData();
@@ -3373,7 +3613,7 @@ function showDefaultDropZone() {
   dz.innerHTML = `
     <div class="icon">💬</div>
     <p>Drag & drop your ChatGPT export here<br>or <strong id="browse-link">browse to select</strong></p>
-    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files</p>
+    <p style="font-size:.82rem;color:#aaa;margin-top:.5rem;">Accepts the <strong>.zip</strong> export directly, or individual <strong>.json</strong> files. Multiple <strong>.zip</strong> files are treated as separate accounts — multiple <strong>.json</strong> files are treated as one account. You can rename accounts later in Settings.</p>
     <input type="file" id="file-input" accept=".zip,.json" multiple />
   `;
   document.getElementById('browse-link').addEventListener('click', () => document.getElementById('file-input').click());
@@ -3421,7 +3661,7 @@ async function checkForSavedData() {
       showMergeDialog({
         desc: `You have ${conversations.length.toLocaleString()} conversations saved in your browser. What would you like to do with the new files?`,
         onAdd:     () => openFilePicker('merge', conversations, pinnedKeys),
-        onReplace: () => { savedData = null; openFilePicker('replace', null); },
+        onReplace: () => { savedData = null; clearIndexedDB(); openFilePicker('replace', null); },
         onCancel:  () => {},  // stay on saved-data screen
       });
     });
@@ -3439,6 +3679,7 @@ document.getElementById('export-data-btn').addEventListener('click', () => {
     _key:     c._key,
     _batchId: c._batchId,
     _account: c._account,
+    _source:  c._source,
     title: c.title,
     date: c.date.toISOString(),
     topic: c.topic,
