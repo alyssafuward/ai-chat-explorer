@@ -2932,6 +2932,8 @@ function renderDownloadsTab() {
     title.style.cursor = 'pointer';
     title.addEventListener('click', () => openConversation(convo));
     titleWrap.appendChild(title);
+    const sb = makeSourceBadge(convo._source);
+    if (sb) titleWrap.appendChild(sb);
 
     const convoChars = convo.messages.reduce((s, m) => s + m.text.length, 0);
     const convoSize = convoChars > 1024 * 1024 ? (convoChars / 1024 / 1024).toFixed(1) + ' MB' : Math.round(convoChars / 1024) + ' KB';
@@ -2941,7 +2943,9 @@ function renderDownloadsTab() {
     meta.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:.15rem';
     const metaDate = document.createElement('span');
     const dateStr = convo.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    metaDate.textContent = multipleAccountsLoaded() ? (convo._account || 'Unknown') + ' · ' + dateStr : dateStr;
+    const sourcePart = multipleSourcesLoaded() ? (convo._source === 'claude' ? 'Claude' : 'ChatGPT') + ' · ' : '';
+    const accountPart = multipleAccountsLoaded() ? (convo._account || 'Unknown') + ' · ' : '';
+    metaDate.textContent = sourcePart + accountPart + dateStr;
     const metaTopic = document.createElement('span');
     metaTopic.style.cssText = 'font-size:.72rem;color:var(--muted)';
     metaTopic.textContent = convo.topic + ' · ' + convoSize;
