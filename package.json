@@ -1,5 +1,5 @@
 {
-  "name": "chatgpt-explorer",
+  "name": "ai-chat-explorer",
   "version": "1.0.0",
   "description": "**Created by [Alyssa Fu Ward](https://substack.com/@alyssafuward)**",
   "main": "index.js",
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alyssafuward/chatgpt-explorer.git"
+    "url": "git+https://github.com/alyssafuward/ai-chat-explorer.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/alyssafuward/chatgpt-explorer/issues"
+    "url": "https://github.com/alyssafuward/ai-chat-explorer/issues"
   },
-  "homepage": "https://github.com/alyssafuward/chatgpt-explorer#readme",
+  "homepage": "https://github.com/alyssafuward/ai-chat-explorer#readme",
   "devDependencies": {
     "@playwright/test": "^1.58.2"
   }

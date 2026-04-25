@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatGPT Explorer</title>
+  <title>AI Chat Explorer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -1184,7 +1184,7 @@
 <!-- ── Upload screen ──────────────────────────────────────────────────────── -->
 
 <div id="upload-screen">
-  <h1>ChatGPT Explorer</h1>
+  <h1>AI Chat Explorer</h1>
   <p class="byline">by <a href="https://substack.com/@alyssafuward" target="_blank" rel="noopener">Alyssa Fu Ward</a></p>
   <p class="subtitle">Upload your ChatGPT export and explore your conversations — what you talked about, when, and how your topics shifted over time.</p>
 
@@ -1208,7 +1208,7 @@
 
 <div id="dashboard">
   <header>
-    <h1>ChatGPT Explorer</h1>
+    <h1>AI Chat Explorer</h1>
     <span id="header-range"></span>
     <div id="header-right">
       <span id="save-status-pill"></span>
@@ -1282,7 +1282,7 @@
   </div>
 
   <div class="intro-block" style="padding-left:2rem;padding-right:2rem;max-width:1100px;margin:0 auto;">
-    <h2>Welcome to ChatGPT Explorer</h2>
+    <h2>Welcome to AI Chat Explorer</h2>
     <p>This tool gives you a bird's-eye view of everything you've talked about with ChatGPT — organized by topic, searchable by keyword, and mapped across time. Pin conversations to mark them for download. Use the tabs below to explore.</p>
   </div>
 
@@ -2986,7 +2986,7 @@ async function downloadAllMarked() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'chatgpt_conversations.zip';
+  a.download = 'ai_chat_conversations.zip';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -3452,7 +3452,7 @@ function refreshSettingsUI() {
 
 // ── IndexedDB ─────────────────────────────────────────────────────────────────
 
-const DB_NAME = 'chatgpt-explorer';
+const DB_NAME = 'ai-chat-explorer';
 const DB_VERSION = 1;
 
 function getDB() {
@@ -3691,12 +3691,12 @@ document.getElementById('export-data-btn').addEventListener('click', () => {
     topic: c.topic,
     messages: c.messages
   }));
-  downloadJSON(exportable, 'chatgpt_conversations.json');
+  downloadJSON(exportable, 'ai_chat_conversations.json');
 });
 
 document.getElementById('export-topics-btn').addEventListener('click', () => {
   const exportable = Object.entries(TOPICS).map(([topic, keywords]) => ({ topic, keywords }));
-  downloadJSON(exportable, 'chatgpt_explorer_topics.json');
+  downloadJSON(exportable, 'ai_chat_explorer_topics.json');
 });
 
 function downloadJSON(data, filename) {
@@ -3817,9 +3817,9 @@ At the end, synthesize this into a **Personal System Prompt** — a short paragr
 function buildProfileCoverMessage() {
   return `I've attached two files:
 
-1. chatgpt-profile-data.txt — my ChatGPT conversation history, filtered to show only my messages (not the AI responses), plus all conversation titles.
+1. ai-chat-profile-data.txt — my AI conversation history, filtered to show only my messages (not the AI responses), plus all conversation titles.
 
-2. chatgpt-profile-prompt.txt — instructions for what I'd like you to do with this data.
+2. ai-chat-profile-prompt.txt — instructions for what I'd like you to do with this data.
 
 Please read both files and follow the instructions in the prompt file.`;
 }
@@ -3868,7 +3868,7 @@ function downloadProfileData() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'chatgpt-profile-data.txt';
+  a.download = 'ai-chat-profile-data.txt';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -3879,7 +3879,7 @@ function downloadProfilePrompt() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'chatgpt-profile-prompt.txt';
+  a.download = 'ai-chat-profile-prompt.txt';
   a.click();
   URL.revokeObjectURL(url);
 }
